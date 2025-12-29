@@ -1,0 +1,5 @@
+dist
+node_modules
+.git
+*.config.js
+*.config.ts

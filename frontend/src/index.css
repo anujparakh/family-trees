@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply m-0 min-h-screen bg-gray-50;
+    /* Prevent native touch gestures from interfering with app gestures */
+    touch-action: none;
+    overscroll-behavior: none;
+  }
+
+  * {
+    /* Ensure box-sizing for consistent layouts */
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  /* Disable text selection during drag operations */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Optimize text rendering */
+  .optimized-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
