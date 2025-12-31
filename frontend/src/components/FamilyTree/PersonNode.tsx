@@ -1,20 +1,13 @@
+import { memo } from 'preact/compat';
 import { format } from 'date-fns';
-import { Person } from '../../data/types';
-
-interface PersonNodeProps {
-  person: Person;
-  isSelected?: boolean;
-  onClick?: () => void;
-  x: number;
-  y: number;
-}
+import { NodeProps } from 'reactflow';
+import { PersonNodeData } from '../../data/types';
 
 /**
- * PersonNode component - renders a single person card in the family tree
+ * PersonNode component - ReactFlow custom node for rendering a person card
  */
-export function PersonNode({ person, isSelected = false, onClick, x, y }: PersonNodeProps) {
-  const nodeWidth = 140;
-  const nodeHeight = 100;
+function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
+  const { person } = data;
 
   // Format dates for display
   const birthYear = person.birthDate ? format(new Date(person.birthDate), 'yyyy') : '?';
@@ -29,79 +22,47 @@ export function PersonNode({ person, isSelected = false, onClick, x, y }: Person
   // Gender-based styling
   const borderColor =
     person.gender === 'male'
-      ? 'stroke-blue-500'
+      ? 'border-blue-500'
       : person.gender === 'female'
-        ? 'stroke-pink-500'
-        : 'stroke-gray-500';
+        ? 'border-pink-500'
+        : 'border-gray-500';
 
-  const bgColor = isSelected ? 'fill-blue-50' : 'fill-white';
+  const bgColor = selected ? 'bg-blue-50' : 'bg-white';
 
   return (
-    <g
-      transform={`translate(${x}, ${y})`}
-      onClick={onClick}
-      className="cursor-pointer"
-      data-person-id={person.id}
+    <div
+      className={`${bgColor} ${borderColor} border-2 rounded-lg shadow-md hover:shadow-lg hover:border-blue-500 transition-all cursor-pointer`}
+      style={{
+        width: '140px',
+        height: '100px',
+        padding: '8px',
+      }}
     >
-      {/* Card background */}
-      <rect
-        width={nodeWidth}
-        height={nodeHeight}
-        rx={8}
-        className={`${bgColor} ${borderColor} stroke-2 hover:stroke-blue-500 transition-colors`}
-        style={{ filter: isSelected ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' : 'none' }}
-      />
-
-      {/* Avatar circle placeholder */}
-      <circle cx={nodeWidth / 2} cy={28} r={18} className="fill-gray-200 stroke-gray-300" />
-
-      {/* Person initials in avatar */}
-      <text
-        x={nodeWidth / 2}
-        y={28}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        className="fill-gray-600 font-semibold no-select"
-        style={{ fontSize: '13px' }}
-      >
-        {person.firstName[0]}
-        {person.lastName[0]}
-      </text>
+      {/* Avatar circle with initials */}
+      <div className="flex justify-center mb-1">
+        <div className="w-9 h-9 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center">
+          <span className="text-gray-600 font-semibold text-xs select-none">
+            {person.firstName[0]}
+            {person.lastName[0]}
+          </span>
+        </div>
+      </div>
 
       {/* Name */}
-      <text
-        x={nodeWidth / 2}
-        y={58}
-        textAnchor="middle"
-        className="fill-gray-900 font-semibold no-select"
-        style={{ fontSize: '15px' }}
-      >
-        {person.firstName}
-      </text>
-
-      {/* Last name */}
-      <text
-        x={nodeWidth / 2}
-        y={74}
-        textAnchor="middle"
-        className="fill-gray-700 no-select"
-        style={{ fontSize: '13px' }}
-      >
-        {person.lastName}
-      </text>
+      <div className="text-center">
+        <div className="text-gray-900 font-semibold text-sm select-none truncate">
+          {person.firstName}
+        </div>
+        <div className="text-gray-700 text-xs select-none truncate">{person.lastName}</div>
+      </div>
 
       {/* Lifespan */}
-      <text
-        x={nodeWidth / 2}
-        y={nodeHeight - 10}
-        textAnchor="middle"
-        className="fill-gray-500 no-select"
-        style={{ fontSize: '11px' }}
-      >
-        {lifespan}
-      </text>
-    </g>
+      <div className="text-center text-gray-500 text-[10px] mt-1 select-none">{lifespan}</div>
+    </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export const PersonNode = memo(PersonNodeComponent);
 
 export default PersonNode;

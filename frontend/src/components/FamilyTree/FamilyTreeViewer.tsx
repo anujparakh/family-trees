@@ -1,10 +1,18 @@
-import { useState, useEffect } from 'preact/hooks';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { useState, useEffect, useCallback } from 'preact/hooks';
+import ReactFlow, {
+  Background,
+  Controls,
+  MiniMap,
+  useNodesState,
+  useEdgesState,
+  NodeTypes,
+  NodeMouseHandler,
+} from 'reactflow';
+import 'reactflow/dist/style.css';
 import { GearIcon, XIcon } from '@phosphor-icons/react';
 import { PersonNode } from './PersonNode';
-import { TreeControls } from './TreeControls';
 import { calculateLayout } from '../../utils/layoutEngine';
-import { FamilyTree, LayoutResult } from '../../data/types';
+import { FamilyTree, PersonNodeData } from '../../data/types';
 import { Button } from '../ui';
 import { TreeIcon } from '../ui/icons';
 import { SettingsDialog } from '../Settings/SettingsDialog';
@@ -13,6 +21,11 @@ interface FamilyTreeViewerProps {
   familyTree: FamilyTree;
   editMode?: boolean;
 }
+
+// Register custom node types
+const nodeTypes: NodeTypes = {
+  person: PersonNode,
+};
 
 /**
  * FamilyTreeViewer - Main component for rendering and interacting with family tree
@@ -23,29 +36,27 @@ export function FamilyTreeViewer({
 }: FamilyTreeViewerProps) {
   const [orientation, setOrientation] = useState<'vertical' | 'horizontal'>('vertical');
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
-  const [layout, setLayout] = useState<LayoutResult | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // ReactFlow node and edge state
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   // Calculate layout when tree or orientation changes
   useEffect(() => {
-    const newLayout = calculateLayout(familyTree, orientation);
-    setLayout(newLayout);
-  }, [familyTree, orientation]);
+    const layout = calculateLayout(familyTree, orientation);
+    setNodes(layout.nodes);
+    setEdges(layout.edges);
+  }, [familyTree, orientation, setNodes, setEdges]);
 
-  if (!layout) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-gray-500">Calculating layout...</div>
-      </div>
-    );
-  }
-
-  const { nodes, edges, bounds } = layout;
-
-  const handlePersonClick = (personId: string) => {
-    setSelectedPersonId(personId);
-    console.log('Selected person:', familyTree.persons[personId]);
-  };
+  // Handle node click
+  const handleNodeClick: NodeMouseHandler = useCallback(
+    (_event, node) => {
+      setSelectedPersonId(node.id);
+      console.log('Selected person:', familyTree.persons[node.id]);
+    },
+    [familyTree]
+  );
 
   const handleOrientationChange = (newOrientation: 'vertical' | 'horizontal') => {
     setOrientation(newOrientation);
@@ -65,73 +76,43 @@ export function FamilyTreeViewer({
       </div>
 
       {/* Tree visualization area */}
-      <div className="flex-1 relative overflow-hidden bg-red-500">
-        {/* Zoom controls - positioned outside TransformWrapper to prevent conflicts */}
-        <TransformWrapper
-          initialScale={0.7}
-          minScale={0.2}
-          maxScale={4}
-          centerOnInit={true}
-          limitToBounds={true}
-          doubleClick={{ mode: 'zoomIn', step: 0.5 }}
-          wheel={{ step: 0.1 }}
-          pinch={{ step: 5 }}
-          panning={{
-            velocityDisabled: false,
-            excluded: ['button'],
-          }}
-          alignmentAnimation={{ disabled: false, sizeX: 0, sizeY: 0 }}
+      <div className="flex-1 relative">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onNodeClick={handleNodeClick}
+          nodeTypes={nodeTypes}
+          fitView
+          minZoom={0.2}
+          maxZoom={4}
+          defaultViewport={{ x: 0, y: 0, zoom: 0.7 }}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          elementsSelectable={true}
+          panOnScroll={true}
+          panOnDrag={true}
+          zoomOnScroll={true}
+          zoomOnPinch={true}
+          zoomOnDoubleClick={true}
         >
-          {({ zoomIn, zoomOut, resetTransform }) => (
-            <>
-              {/* Zoom controls */}
-              <TreeControls onZoomIn={zoomIn} onZoomOut={zoomOut} onReset={resetTransform} />
-
-              {/* Transformable SVG */}
-              <TransformComponent
-                wrapperClass=""
-                contentClass="flex items-center justify-center bg-green-500"
-              >
-                <svg
-                  width={bounds.width}
-                  height={bounds.height}
-                  className="no-select"
-                  style={{ touchAction: 'none' }}
-                >
-                  {/* Render edges first (so they appear behind nodes) */}
-                  <g className="edges">
-                    {edges.map((edge) => (
-                      <line
-                        key={edge.id}
-                        x1={edge.x1}
-                        y1={edge.y1}
-                        x2={edge.x2}
-                        y2={edge.y2}
-                        stroke={edge.type === 'spouse' ? '#9CA3AF' : '#D1D5DB'}
-                        strokeWidth={edge.type === 'spouse' ? 2 : 1.5}
-                        strokeLinecap="round"
-                      />
-                    ))}
-                  </g>
-
-                  {/* Render person nodes */}
-                  <g className="nodes">
-                    {nodes.map((node) => (
-                      <PersonNode
-                        key={node.id}
-                        person={node.person}
-                        x={node.x}
-                        y={node.y}
-                        isSelected={node.id === selectedPersonId}
-                        onClick={() => handlePersonClick(node.id)}
-                      />
-                    ))}
-                  </g>
-                </svg>
-              </TransformComponent>
-            </>
-          )}
-        </TransformWrapper>
+          <Background color="#E5E7EB" gap={16} />
+          <Controls showInteractive={false} />
+          <MiniMap
+            nodeColor={(node) => {
+              const data = node.data as PersonNodeData;
+              return data.person.gender === 'male'
+                ? '#3B82F6'
+                : data.person.gender === 'female'
+                  ? '#EC4899'
+                  : '#6B7280';
+            }}
+            nodeStrokeWidth={3}
+            zoomable
+            pannable
+          />
+        </ReactFlow>
       </div>
 
       {/* Selected person details (bottom sheet) */}

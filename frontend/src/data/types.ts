@@ -1,3 +1,5 @@
+import { Node, Edge } from 'reactflow';
+
 export interface Person {
   id: string;
   firstName: string;
@@ -23,26 +25,23 @@ export interface FamilyTree {
   rootPersonId: string;
 }
 
-export interface LayoutNode {
-  id: string;
+// ReactFlow-compatible types
+export interface PersonNodeData {
   person: Person;
-  x: number;
-  y: number;
   generation: number;
 }
 
-export interface LayoutEdge {
-  id: string;
+export type PersonNode = Node<PersonNodeData>;
+
+export interface FamilyEdgeData {
   type: 'parent-child' | 'spouse';
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
 }
 
+export type FamilyEdge = Edge<FamilyEdgeData>;
+
 export interface LayoutResult {
-  nodes: LayoutNode[];
-  edges: LayoutEdge[];
+  nodes: PersonNode[];
+  edges: FamilyEdge[];
   bounds: {
     width: number;
     height: number;

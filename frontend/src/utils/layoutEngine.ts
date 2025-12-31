@@ -1,8 +1,9 @@
-import { FamilyTree, LayoutResult, LayoutNode, LayoutEdge } from '../data/types';
+import { FamilyTree, LayoutResult, PersonNode, FamilyEdge } from '../data/types';
 
 /**
  * Layout engine for family trees
  * Calculates node positions for vertical and horizontal orientations
+ * Returns ReactFlow-compatible nodes and edges
  */
 
 const NODE_WIDTH = 140;
@@ -65,10 +66,10 @@ function buildGenerations(tree: FamilyTree): GenerationData {
  * Calculate vertical layout (ancestors at top, descendants below)
  */
 export function calculateVerticalLayout(tree: FamilyTree): LayoutResult {
-  const { generations } = buildGenerations(tree);
+  const { generations, personGeneration } = buildGenerations(tree);
 
-  const nodes: LayoutNode[] = [];
-  const edges: LayoutEdge[] = [];
+  const nodes: PersonNode[] = [];
+  const edges: FamilyEdge[] = [];
 
   // Calculate positions for each generation
   const genArray = Array.from(generations.keys()).sort((a, b) => a - b);
@@ -76,6 +77,9 @@ export function calculateVerticalLayout(tree: FamilyTree): LayoutResult {
   const maxGen = genArray[genArray.length - 1];
 
   let maxWidth = 0;
+
+  // Temporary position map for edge calculation
+  const positionMap = new Map<string, { x: number; y: number }>();
 
   genArray.forEach((gen) => {
     const people = generations.get(gen)!;
@@ -87,113 +91,81 @@ export function calculateVerticalLayout(tree: FamilyTree): LayoutResult {
 
     people.forEach((personId, index) => {
       const x = startX + index * (NODE_WIDTH + HORIZONTAL_SPACING);
-      nodes.push({
-        id: personId,
-        person: tree.persons[personId],
-        x,
-        y,
-        generation: gen,
-      });
+      positionMap.set(personId, { x, y });
     });
   });
 
-  // Center each generation
-  nodes.forEach((node) => {
-    const genPeople = generations.get(node.generation)!;
+  // Center each generation and create ReactFlow nodes
+  positionMap.forEach((pos, personId) => {
+    const gen = personGeneration.get(personId)!;
+    const genPeople = generations.get(gen)!;
     const genWidth = genPeople.length * NODE_WIDTH + (genPeople.length - 1) * HORIZONTAL_SPACING;
     const offset = (maxWidth - genWidth) / 2;
-    node.x += offset;
+
+    const PADDING = 50;
+
+    nodes.push({
+      id: personId,
+      type: 'person',
+      position: {
+        x: pos.x + offset + PADDING,
+        y: pos.y + PADDING,
+      },
+      data: {
+        person: tree.persons[personId],
+        generation: gen,
+      },
+    });
   });
 
-  // Create edges between parents and children
+  // Create edges between family members
   tree.families.forEach((family) => {
-    const parentNodes = family.parents
-      .map((pid) => nodes.find((n) => n.id === pid))
-      .filter((n): n is LayoutNode => n !== undefined);
-    const childNodes = family.children
-      .map((cid) => nodes.find((n) => n.id === cid))
-      .filter((n): n is LayoutNode => n !== undefined);
+    const parents = family.parents.filter((pid) => tree.persons[pid]);
+    const children = family.children.filter((cid) => tree.persons[cid]);
 
-    // Draw lines from parents to children
-    if (parentNodes.length > 0 && childNodes.length > 0) {
-      // Calculate midpoint between parents
-      const parentMidX =
-        parentNodes.reduce((sum, n) => sum + n.x, 0) / parentNodes.length + NODE_WIDTH / 2;
-      const parentY = parentNodes[0].y + NODE_HEIGHT;
-
-      // Calculate midpoint of children
-      const childMidX =
-        childNodes.reduce((sum, n) => sum + n.x, 0) / childNodes.length + NODE_WIDTH / 2;
-      const childY = childNodes[0].y;
-
-      const midY = (parentY + childY) / 2;
-
-      // Vertical line from parents
+    // Create spouse edge between parents
+    if (parents.length === 2) {
       edges.push({
-        id: `family-${family.id}-down`,
-        type: 'parent-child',
-        x1: parentMidX,
-        y1: parentY,
-        x2: parentMidX,
-        y2: midY,
-      });
-
-      // Horizontal line
-      if (parentMidX !== childMidX) {
-        edges.push({
-          id: `family-${family.id}-horizontal`,
-          type: 'parent-child',
-          x1: Math.min(parentMidX, childMidX),
-          y1: midY,
-          x2: Math.max(parentMidX, childMidX),
-          y2: midY,
-        });
-      }
-
-      // Lines down to each child
-      childNodes.forEach((child, idx) => {
-        const childX = child.x + NODE_WIDTH / 2;
-        edges.push({
-          id: `family-${family.id}-child-${idx}`,
-          type: 'parent-child',
-          x1: childX,
-          y1: midY,
-          x2: childX,
-          y2: childY,
-        });
-      });
-
-      // Line between spouses/parents
-      if (parentNodes.length === 2) {
-        edges.push({
-          id: `family-${family.id}-spouse`,
+        id: `spouse-${family.id}`,
+        source: parents[0],
+        target: parents[1],
+        type: 'straight',
+        data: {
           type: 'spouse',
-          x1: parentNodes[0].x + NODE_WIDTH,
-          y1: parentNodes[0].y + NODE_HEIGHT / 2,
-          x2: parentNodes[1].x,
-          y2: parentNodes[1].y + NODE_HEIGHT / 2,
+        },
+        style: {
+          stroke: '#9CA3AF',
+          strokeWidth: 2,
+        },
+      });
+    }
+
+    // Create parent-child edges
+    if (parents.length > 0 && children.length > 0) {
+      // For now, connect first parent to each child
+      // Later we can add custom edges for more complex routing
+      const parent = parents[0];
+      children.forEach((child) => {
+        edges.push({
+          id: `parent-child-${parent}-${child}`,
+          source: parent,
+          target: child,
+          type: 'smoothstep',
+          data: {
+            type: 'parent-child',
+          },
+          style: {
+            stroke: '#D1D5DB',
+            strokeWidth: 1.5,
+          },
         });
-      }
+      });
     }
   });
 
-  // Add padding offset to all nodes so they're not at the edge
   const PADDING = 50;
-  nodes.forEach((node) => {
-    node.x += PADDING;
-    node.y += PADDING;
-  });
-
-  // Update edge positions with padding offset
-  edges.forEach((edge) => {
-    edge.x1 += PADDING;
-    edge.y1 += PADDING;
-    edge.x2 += PADDING;
-    edge.y2 += PADDING;
-  });
-
   const bounds = {
-    width: maxWidth + PADDING * 2, // Add padding on both sides
+    width: maxWidth + PADDING * 2,
     height: (maxGen - minGen) * (NODE_HEIGHT + VERTICAL_SPACING) + NODE_HEIGHT + PADDING * 2,
   };
 
@@ -207,19 +179,13 @@ export function calculateHorizontalLayout(tree: FamilyTree): LayoutResult {
   // For POC, use vertical layout and rotate coordinates
   const vertical = calculateVerticalLayout(tree);
 
-  // Swap x and y, and swap width and height
+  // Swap x and y for horizontal orientation
   const nodes = vertical.nodes.map((node) => ({
     ...node,
-    x: node.y,
-    y: node.x,
-  }));
-
-  const edges = vertical.edges.map((edge) => ({
-    ...edge,
-    x1: edge.y1,
-    y1: edge.x1,
-    x2: edge.y2,
-    y2: edge.x2,
+    position: {
+      x: node.position.y,
+      y: node.position.x,
+    },
   }));
 
   const bounds = {
@@ -227,7 +193,7 @@ export function calculateHorizontalLayout(tree: FamilyTree): LayoutResult {
     height: vertical.bounds.width,
   };
 
-  return { nodes, edges, bounds };
+  return { nodes, edges: vertical.edges, bounds };
 }
 
 /**
