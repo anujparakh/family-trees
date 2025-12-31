@@ -10,16 +10,17 @@ import ReactFlow, {
   NodeMouseHandler,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { GearIcon, XIcon, QuestionIcon } from '@phosphor-icons/react';
+import { GearIcon, QuestionIcon } from '@phosphor-icons/react';
 import { PersonNode } from './PersonNode';
 import { SpouseEdge } from './SpouseEdge';
 import { ParentChildEdge } from './ParentChildEdge';
 import { calculateLayout } from '../../utils/layoutEngine';
-import { FamilyTree, PersonNodeData } from '../../data/types';
+import { FamilyTree, PersonNodeData, Person } from '../../data/types';
 import { Button } from '../ui';
 import { TreeIcon } from '../ui/icons';
 import { SettingsDialog } from '../Settings/SettingsDialog';
 import { HowToDialog } from '../HowToDialog';
+import { PersonDetailsDialog } from '../PersonDetailsDialog';
 import { hasSeenInstructions, markInstructionsAsSeen } from '../../utils/sessionStorage';
 
 interface FamilyTreeViewerProps {
@@ -46,7 +47,7 @@ export function FamilyTreeViewer({
   editMode: _editMode = false,
 }: FamilyTreeViewerProps) {
   const [orientation, setOrientation] = useState<'vertical' | 'horizontal'>('vertical');
-  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHowToOpen, setIsHowToOpen] = useState(false);
 
@@ -71,8 +72,10 @@ export function FamilyTreeViewer({
   // Handle node click
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
-      setSelectedPersonId(node.id);
-      console.log('Selected person:', familyTree.persons[node.id]);
+      const person = familyTree.persons[node.id];
+      if (person) {
+        setSelectedPerson(person);
+      }
     },
     [familyTree]
   );
@@ -94,7 +97,7 @@ export function FamilyTreeViewer({
           <TreeIcon size={28} className="text-blue-500" />
           <h1 className="text-xl font-semibold text-gray-800">Family Tree</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <Button variant="ghost" onClick={() => setIsHowToOpen(true)} ariaLabel="Help">
             <QuestionIcon size={20} weight="regular" />
           </Button>
@@ -148,37 +151,13 @@ export function FamilyTreeViewer({
         </ReactFlow>
       </div>
 
-      {/* Selected person details (bottom sheet) */}
-      {selectedPersonId && (
-        <div className="bg-white border-t border-gray-200 p-4 shadow-lg">
-          <div className="max-w-2xl mx-auto">
-            <div className="flex justify-between items-start">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {familyTree.persons[selectedPersonId].firstName}{' '}
-                  {familyTree.persons[selectedPersonId].lastName}
-                </h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Born: {familyTree.persons[selectedPersonId].birthDate || 'Unknown'}
-                </p>
-                {familyTree.persons[selectedPersonId].deathDate && (
-                  <p className="text-sm text-gray-600">
-                    Died: {familyTree.persons[selectedPersonId].deathDate}
-                  </p>
-                )}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedPersonId(null)}
-                ariaLabel="Close"
-              >
-                <XIcon size={20} weight="bold" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Person Details Dialog */}
+      <PersonDetailsDialog
+        isOpen={selectedPerson !== null}
+        onClose={() => setSelectedPerson(null)}
+        person={selectedPerson}
+        familyTree={familyTree}
+      />
 
       {/* Settings Dialog */}
       <SettingsDialog

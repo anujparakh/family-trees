@@ -31,7 +31,7 @@ function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
 
   return (
     <div
-      className={`${bgColor} ${borderColor} border-2 rounded-lg shadow-md hover:shadow-lg hover:border-blue-500 transition-all cursor-pointer overflow-hidden flex flex-col p-2 min-w-[140px] max-w-[140px] min-h-[100px]`}
+      className={`${bgColor} ${borderColor} border-2 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition-all cursor-pointer overflow-hidden flex flex-col p-2 min-w-[140px] max-w-[140px] min-h-[100px]`}
     >
       {/* Connection handles for edges - hidden but functional */}
       <Handle
