@@ -1,0 +1,1 @@
+export { TreeIcon } from './TreeIcon';

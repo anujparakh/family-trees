@@ -52,11 +52,17 @@ export function Button({
   type = 'button',
 }: ButtonProps) {
   const isIcon = variant === 'icon';
+  const clickit = () => {
+    if (onClick) {
+      console.log('Clicking ', ariaLabel);
+      onClick();
+    }
+  };
 
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={clickit}
       disabled={disabled}
       aria-label={ariaLabel}
       className={clsx(

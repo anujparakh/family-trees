@@ -5,10 +5,10 @@ import { FamilyTree, LayoutResult, LayoutNode, LayoutEdge } from '../data/types'
  * Calculates node positions for vertical and horizontal orientations
  */
 
-const NODE_WIDTH = 120;
-const NODE_HEIGHT = 80;
-const HORIZONTAL_SPACING = 40;
-const VERTICAL_SPACING = 100;
+const NODE_WIDTH = 140;
+const NODE_HEIGHT = 100;
+const HORIZONTAL_SPACING = 50;
+const VERTICAL_SPACING = 120;
 
 interface GenerationData {
   generations: Map<number, string[]>;

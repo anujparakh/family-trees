@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'preact/hooks';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { GearIcon, XIcon } from '@phosphor-icons/react';
 import { PersonNode } from './PersonNode';
 import { TreeControls } from './TreeControls';
 import { calculateLayout } from '../../utils/layoutEngine';
 import { FamilyTree, LayoutResult } from '../../data/types';
 import { Button } from '../ui';
+import { TreeIcon } from '../ui/icons';
+import { SettingsDialog } from '../Settings/SettingsDialog';
 
 interface FamilyTreeViewerProps {
   familyTree: FamilyTree;
@@ -21,6 +24,7 @@ export function FamilyTreeViewer({
   const [orientation, setOrientation] = useState<'vertical' | 'horizontal'>('vertical');
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [layout, setLayout] = useState<LayoutResult | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Calculate layout when tree or orientation changes
   useEffect(() => {
@@ -43,36 +47,40 @@ export function FamilyTreeViewer({
     console.log('Selected person:', familyTree.persons[personId]);
   };
 
-  const handleToggleOrientation = () => {
-    setOrientation((prev) => (prev === 'vertical' ? 'horizontal' : 'vertical'));
+  const handleOrientationChange = (newOrientation: 'vertical' | 'horizontal') => {
+    setOrientation(newOrientation);
   };
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50">
       {/* Header with controls */}
       <div className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-        <h1 className="text-xl font-semibold text-gray-800">Family Trees</h1>
-        <div className="flex gap-2">
-          <Button variant="primary" onClick={handleToggleOrientation}>
-            {orientation === 'vertical' ? 'Horizontal' : 'Vertical'}
-          </Button>
+        <div className="flex items-center gap-3">
+          <TreeIcon size={28} className="text-blue-500" />
+          <h1 className="text-xl font-semibold text-gray-800">Family Tree</h1>
         </div>
+        <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} ariaLabel="Settings">
+          <GearIcon size={20} weight="regular" />
+        </Button>
       </div>
 
       {/* Tree visualization area */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden bg-red-500">
+        {/* Zoom controls - positioned outside TransformWrapper to prevent conflicts */}
         <TransformWrapper
-          initialScale={0.8}
-          minScale={0.25}
-          maxScale={3}
+          initialScale={0.7}
+          minScale={0.2}
+          maxScale={4}
           centerOnInit={true}
-          limitToBounds={false}
+          limitToBounds={true}
           doubleClick={{ mode: 'zoomIn', step: 0.5 }}
           wheel={{ step: 0.1 }}
           pinch={{ step: 5 }}
           panning={{
             velocityDisabled: false,
+            excluded: ['button'],
           }}
+          alignmentAnimation={{ disabled: false, sizeX: 0, sizeY: 0 }}
         >
           {({ zoomIn, zoomOut, resetTransform }) => (
             <>
@@ -81,8 +89,8 @@ export function FamilyTreeViewer({
 
               {/* Transformable SVG */}
               <TransformComponent
-                wrapperClass="w-full h-full"
-                contentClass="w-full h-full flex items-center justify-center"
+                wrapperClass=""
+                contentClass="flex items-center justify-center bg-green-500"
               >
                 <svg
                   width={bounds.width}
@@ -151,12 +159,20 @@ export function FamilyTreeViewer({
                 onClick={() => setSelectedPersonId(null)}
                 ariaLabel="Close"
               >
-                ✕
+                <XIcon size={20} weight="bold" />
               </Button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Settings Dialog */}
+      <SettingsDialog
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        orientation={orientation}
+        onOrientationChange={handleOrientationChange}
+      />
     </div>
   );
 }
