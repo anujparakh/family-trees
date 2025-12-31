@@ -10,7 +10,7 @@ import ReactFlow, {
   NodeMouseHandler,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { GearIcon, XIcon } from '@phosphor-icons/react';
+import { GearIcon, XIcon, QuestionIcon } from '@phosphor-icons/react';
 import { PersonNode } from './PersonNode';
 import { SpouseEdge } from './SpouseEdge';
 import { ParentChildEdge } from './ParentChildEdge';
@@ -19,6 +19,8 @@ import { FamilyTree, PersonNodeData } from '../../data/types';
 import { Button } from '../ui';
 import { TreeIcon } from '../ui/icons';
 import { SettingsDialog } from '../Settings/SettingsDialog';
+import { HowToDialog } from '../HowToDialog';
+import { hasSeenInstructions, markInstructionsAsSeen } from '../../utils/sessionStorage';
 
 interface FamilyTreeViewerProps {
   familyTree: FamilyTree;
@@ -46,10 +48,18 @@ export function FamilyTreeViewer({
   const [orientation, setOrientation] = useState<'vertical' | 'horizontal'>('vertical');
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHowToOpen, setIsHowToOpen] = useState(false);
 
   // ReactFlow node and edge state
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  // Check if user has seen instructions on mount
+  useEffect(() => {
+    if (!hasSeenInstructions()) {
+      setIsHowToOpen(true);
+    }
+  }, []);
 
   // Calculate layout when tree or orientation changes
   useEffect(() => {
@@ -71,6 +81,11 @@ export function FamilyTreeViewer({
     setOrientation(newOrientation);
   };
 
+  const handleHowToClose = () => {
+    setIsHowToOpen(false);
+    markInstructionsAsSeen();
+  };
+
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50">
       {/* Header with controls */}
@@ -79,9 +94,14 @@ export function FamilyTreeViewer({
           <TreeIcon size={28} className="text-blue-500" />
           <h1 className="text-xl font-semibold text-gray-800">Family Tree</h1>
         </div>
-        <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} ariaLabel="Settings">
-          <GearIcon size={20} weight="regular" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" onClick={() => setIsHowToOpen(true)} ariaLabel="Help">
+            <QuestionIcon size={20} weight="regular" />
+          </Button>
+          <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} ariaLabel="Settings">
+            <GearIcon size={20} weight="regular" />
+          </Button>
+        </div>
       </div>
 
       {/* Tree visualization area */}
@@ -167,6 +187,9 @@ export function FamilyTreeViewer({
         orientation={orientation}
         onOrientationChange={handleOrientationChange}
       />
+
+      {/* How To Dialog */}
+      <HowToDialog isOpen={isHowToOpen} onClose={handleHowToClose} />
     </div>
   );
 }
