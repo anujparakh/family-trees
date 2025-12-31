@@ -2,14 +2,14 @@ import { FamilyTree, LayoutResult, PersonNode, FamilyEdge } from '../data/types'
 
 /**
  * Layout engine for family trees
- * Calculates node positions for vertical and horizontal orientations
- * Returns ReactFlow-compatible nodes and edges
+ * Simple manual layout with full control over positioning
  */
 
 const NODE_WIDTH = 140;
 const NODE_HEIGHT = 100;
-const HORIZONTAL_SPACING = 50;
-const VERTICAL_SPACING = 120;
+const HORIZONTAL_SPACING = 80;
+const VERTICAL_SPACING = 180;
+const SPOUSE_SPACING = 50; // Closer spacing for spouses
 
 interface GenerationData {
   generations: Map<number, string[]>;
@@ -17,7 +17,7 @@ interface GenerationData {
 }
 
 /**
- * Build generational levels from family tree
+ * Assign generation levels to each person
  */
 function buildGenerations(tree: FamilyTree): GenerationData {
   const generations = new Map<number, string[]>();
@@ -27,15 +27,22 @@ function buildGenerations(tree: FamilyTree): GenerationData {
   function assignGeneration(personId: string, generation: number) {
     if (visited.has(personId)) return;
     visited.add(personId);
-
     personGeneration.set(personId, generation);
 
-    if (!generations.has(generation)) {
-      generations.set(generation, []);
-    }
-    generations.get(generation)!.push(personId);
+    // First, assign same generation to all spouses (other parents in same families)
+    tree.families.forEach((family) => {
+      if (family.parents.includes(personId)) {
+        // Assign same generation to spouse(s)
+        family.parents.forEach((spouseId) => {
+          if (!visited.has(spouseId)) {
+            visited.add(spouseId);
+            personGeneration.set(spouseId, generation);
+          }
+        });
+      }
+    });
 
-    // Find children
+    // Then find and assign children to next generation
     tree.families.forEach((family) => {
       if (family.parents.includes(personId)) {
         family.children.forEach((childId) => {
@@ -44,7 +51,7 @@ function buildGenerations(tree: FamilyTree): GenerationData {
       }
     });
 
-    // Find parents
+    // Find parents and assign to previous generation
     tree.families.forEach((family) => {
       if (family.children.includes(personId)) {
         family.parents.forEach((parentId) => {
@@ -59,154 +66,190 @@ function buildGenerations(tree: FamilyTree): GenerationData {
   // Start from root
   assignGeneration(tree.rootPersonId, 0);
 
+  // Build generations map
+  personGeneration.forEach((gen, personId) => {
+    if (!generations.has(gen)) {
+      generations.set(gen, []);
+    }
+    generations.get(gen)!.push(personId);
+  });
+
   return { generations, personGeneration };
 }
 
 /**
- * Calculate vertical layout (ancestors at top, descendants below)
+ * Get spouse pairs from families
  */
-export function calculateVerticalLayout(tree: FamilyTree): LayoutResult {
-  const { generations, personGeneration } = buildGenerations(tree);
+function getSpousePairs(tree: FamilyTree): Map<string, string[]> {
+  const spousePairs = new Map<string, string[]>();
 
-  const nodes: PersonNode[] = [];
-  const edges: FamilyEdge[] = [];
-
-  // Calculate positions for each generation
-  const genArray = Array.from(generations.keys()).sort((a, b) => a - b);
-  const minGen = genArray[0];
-  const maxGen = genArray[genArray.length - 1];
-
-  let maxWidth = 0;
-
-  // Temporary position map for edge calculation
-  const positionMap = new Map<string, { x: number; y: number }>();
-
-  genArray.forEach((gen) => {
-    const people = generations.get(gen)!;
-    const genWidth = people.length * NODE_WIDTH + (people.length - 1) * HORIZONTAL_SPACING;
-    maxWidth = Math.max(maxWidth, genWidth);
-
-    const startX = 0; // We'll center later
-    const y = (gen - minGen) * (NODE_HEIGHT + VERTICAL_SPACING);
-
-    people.forEach((personId, index) => {
-      const x = startX + index * (NODE_WIDTH + HORIZONTAL_SPACING);
-      positionMap.set(personId, { x, y });
-    });
-  });
-
-  // Center each generation and create ReactFlow nodes
-  positionMap.forEach((pos, personId) => {
-    const gen = personGeneration.get(personId)!;
-    const genPeople = generations.get(gen)!;
-    const genWidth = genPeople.length * NODE_WIDTH + (genPeople.length - 1) * HORIZONTAL_SPACING;
-    const offset = (maxWidth - genWidth) / 2;
-
-    const PADDING = 50;
-
-    nodes.push({
-      id: personId,
-      type: 'person',
-      position: {
-        x: pos.x + offset + PADDING,
-        y: pos.y + PADDING,
-      },
-      data: {
-        person: tree.persons[personId],
-        generation: gen,
-      },
-    });
-  });
-
-  // Create edges between family members
   tree.families.forEach((family) => {
-    const parents = family.parents.filter((pid) => tree.persons[pid]);
-    const children = family.children.filter((cid) => tree.persons[cid]);
-
-    // Create spouse edge between parents
-    if (parents.length === 2) {
-      edges.push({
-        id: `spouse-${family.id}`,
-        source: parents[0],
-        target: parents[1],
-        type: 'straight',
-        data: {
-          type: 'spouse',
-        },
-        style: {
-          stroke: '#9CA3AF',
-          strokeWidth: 2,
-        },
-      });
-    }
-
-    // Create parent-child edges
-    if (parents.length > 0 && children.length > 0) {
-      // For now, connect first parent to each child
-      // Later we can add custom edges for more complex routing
-      const parent = parents[0];
-      children.forEach((child) => {
-        edges.push({
-          id: `parent-child-${parent}-${child}`,
-          source: parent,
-          target: child,
-          type: 'smoothstep',
-          data: {
-            type: 'parent-child',
-          },
-          style: {
-            stroke: '#D1D5DB',
-            strokeWidth: 1.5,
-          },
-        });
-      });
+    if (family.parents.length === 2) {
+      const [parent1, parent2] = family.parents;
+      spousePairs.set(parent1, [parent1, parent2]);
+      spousePairs.set(parent2, [parent1, parent2]);
     }
   });
 
-  const PADDING = 50;
-  const bounds = {
-    width: maxWidth + PADDING * 2,
-    height: (maxGen - minGen) * (NODE_HEIGHT + VERTICAL_SPACING) + NODE_HEIGHT + PADDING * 2,
-  };
-
-  return { nodes, edges, bounds };
+  return spousePairs;
 }
 
 /**
- * Calculate horizontal layout (ancestors at left, descendants to right)
- */
-export function calculateHorizontalLayout(tree: FamilyTree): LayoutResult {
-  // For POC, use vertical layout and rotate coordinates
-  const vertical = calculateVerticalLayout(tree);
-
-  // Swap x and y for horizontal orientation
-  const nodes = vertical.nodes.map((node) => ({
-    ...node,
-    position: {
-      x: node.position.y,
-      y: node.position.x,
-    },
-  }));
-
-  const bounds = {
-    width: vertical.bounds.height,
-    height: vertical.bounds.width,
-  };
-
-  return { nodes, edges: vertical.edges, bounds };
-}
-
-/**
- * Calculate layout based on orientation
+ * Calculate layout manually
  */
 export function calculateLayout(
   tree: FamilyTree,
   orientation: 'vertical' | 'horizontal' = 'vertical'
 ): LayoutResult {
+  const { generations } = buildGenerations(tree);
+  const spousePairs = getSpousePairs(tree);
+  const nodes: PersonNode[] = [];
+  const edges: FamilyEdge[] = [];
+
+  // Sort generations
+  const genArray = Array.from(generations.keys()).sort((a, b) => a - b);
+  const minGen = genArray[0];
+
+  // Layout each generation
+  genArray.forEach((gen) => {
+    const people = generations.get(gen)!;
+    const processed = new Set<string>();
+    const genPeople: string[] = [];
+
+    // Group spouses together
+    people.forEach((personId) => {
+      if (processed.has(personId)) return;
+
+      const pair = spousePairs.get(personId);
+      if (pair) {
+        // Add spouse pair together
+        genPeople.push(...pair);
+        pair.forEach((p) => processed.add(p));
+      } else {
+        // Add single person
+        genPeople.push(personId);
+        processed.add(personId);
+      }
+    });
+
+    // Calculate positions for this generation
+    let currentX = 0;
+    const y = (gen - minGen) * VERTICAL_SPACING;
+
+    genPeople.forEach((personId) => {
+      // Check if this person is part of a spouse pair
+      const pair = spousePairs.get(personId);
+      const isFirstInPair = pair && pair[0] === personId;
+      const isSecondInPair = pair && pair[1] === personId;
+
+      // Position the person
+      nodes.push({
+        id: personId,
+        type: 'person',
+        position: { x: currentX, y },
+        data: {
+          person: tree.persons[personId],
+          generation: gen,
+        },
+      });
+
+      // Update X for next person
+      if (isFirstInPair) {
+        // Next person is spouse, use closer spacing
+        currentX += NODE_WIDTH + SPOUSE_SPACING;
+      } else if (isSecondInPair) {
+        // After spouse pair, use normal spacing
+        currentX += NODE_WIDTH + HORIZONTAL_SPACING;
+      } else {
+        // Single person, use normal spacing
+        currentX += NODE_WIDTH + HORIZONTAL_SPACING;
+      }
+    });
+
+    // Center this generation
+    const genWidth = currentX - HORIZONTAL_SPACING;
+    const offset = -genWidth / 2;
+    nodes.forEach((node) => {
+      if (node.data.generation === gen) {
+        node.position.x += offset;
+      }
+    });
+  });
+
+  // Create edges
+  tree.families.forEach((family) => {
+    const parents = family.parents.filter((pid) => tree.persons[pid]);
+    const children = family.children.filter((cid) => tree.persons[cid]);
+
+    // Spouse edge (horizontal connection between parents)
+    if (parents.length === 2) {
+      edges.push({
+        id: `spouse-${family.id}`,
+        source: parents[0],
+        target: parents[1],
+        sourceHandle: 'right',
+        targetHandle: 'left',
+        type: 'spouse',
+        data: {
+          type: 'spouse',
+        },
+      });
+    }
+
+    // Parent-child edges with T-junction routing
+    if (parents.length > 0 && children.length > 0) {
+      // Calculate midpoint between parents for source
+      const parentNodes = parents
+        .map((pid) => nodes.find((n) => n.id === pid))
+        .filter((n): n is PersonNode => n !== undefined);
+
+      if (parentNodes.length > 0) {
+        // Use first parent as source node, but calculate midpoint X
+        const sourceParent = parents[0];
+        const parentNode = parentNodes[0];
+
+        // Calculate midpoint X between parents
+        let midpointX = parentNode.position.x + NODE_WIDTH / 2;
+        if (parentNodes.length === 2) {
+          const parent1X = parentNodes[0].position.x + NODE_WIDTH / 2;
+          const parent2X = parentNodes[1].position.x + NODE_WIDTH / 2;
+          midpointX = (parent1X + parent2X) / 2;
+        }
+
+        // Calculate positions for T-junction
+        const spouseEdgeY = parentNode.position.y + NODE_HEIGHT / 2 + 6; // Middle of parent nodes (where spouse edge is)
+        const junctionY = parentNode.position.y + NODE_HEIGHT + 60; // Horizontal junction line below parents
+
+        children.forEach((child) => {
+          edges.push({
+            id: `parent-child-${sourceParent}-${child}`,
+            source: sourceParent,
+            target: child,
+            sourceHandle: 'bottom',
+            targetHandle: 'top',
+            type: 'parentChild',
+            data: {
+              type: 'parent-child',
+              junctionY,
+              midpointX, // X position at center of spouse pair
+              spouseEdgeY, // Y position where spouse edge is (start point)
+            },
+          });
+        });
+      }
+    }
+  });
+
+  // Handle horizontal orientation (swap x and y)
   if (orientation === 'horizontal') {
-    return calculateHorizontalLayout(tree);
+    nodes.forEach((node) => {
+      const temp = node.position.x;
+      node.position.x = node.position.y;
+      node.position.y = temp;
+    });
   }
-  return calculateVerticalLayout(tree);
+
+  return { nodes, edges };
 }
 
 export default calculateLayout;

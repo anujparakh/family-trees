@@ -6,11 +6,14 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   NodeTypes,
+  EdgeTypes,
   NodeMouseHandler,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { GearIcon, XIcon } from '@phosphor-icons/react';
 import { PersonNode } from './PersonNode';
+import { SpouseEdge } from './SpouseEdge';
+import { ParentChildEdge } from './ParentChildEdge';
 import { calculateLayout } from '../../utils/layoutEngine';
 import { FamilyTree, PersonNodeData } from '../../data/types';
 import { Button } from '../ui';
@@ -25,6 +28,12 @@ interface FamilyTreeViewerProps {
 // Register custom node types
 const nodeTypes: NodeTypes = {
   person: PersonNode,
+};
+
+// Register custom edge types
+const edgeTypes: EdgeTypes = {
+  spouse: SpouseEdge,
+  parentChild: ParentChildEdge,
 };
 
 /**
@@ -84,12 +93,16 @@ export function FamilyTreeViewer({
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           fitView
+          fitViewOptions={{ padding: 0.2 }}
           minZoom={0.2}
           maxZoom={4}
           defaultViewport={{ x: 0, y: 0, zoom: 0.7 }}
           nodesDraggable={false}
           nodesConnectable={false}
+          edgesUpdatable={false}
+          edgesFocusable={false}
           elementsSelectable={true}
           panOnScroll={true}
           panOnDrag={true}

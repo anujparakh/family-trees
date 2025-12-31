@@ -35,6 +35,9 @@ export type PersonNode = Node<PersonNodeData>;
 
 export interface FamilyEdgeData {
   type: 'parent-child' | 'spouse';
+  junctionY?: number; // Y position for shared horizontal junction line
+  midpointX?: number; // X position for midpoint between parents
+  spouseEdgeY?: number; // Y position where spouse edge is (vertical center of parents)
 }
 
 export type FamilyEdge = Edge<FamilyEdgeData>;
@@ -42,8 +45,4 @@ export type FamilyEdge = Edge<FamilyEdgeData>;
 export interface LayoutResult {
   nodes: PersonNode[];
   edges: FamilyEdge[];
-  bounds: {
-    width: number;
-    height: number;
-  };
 }
