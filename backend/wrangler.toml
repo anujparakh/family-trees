@@ -7,7 +7,7 @@ node_compat = true
 [[d1_databases]]
 binding = "DB"
 database_name = "family-trees-db"
-database_id = "" # You'll fill this after creating the D1 database
+database_id = "4afdc470-dd7c-4291-8113-a8be98b34c93" # You'll fill this after creating the D1 database
 
 # Environment variables (add via Cloudflare dashboard or wrangler secret)
 # CLERK_PUBLISHABLE_KEY - from Clerk dashboard
