@@ -22,7 +22,7 @@ function ParentChildEdgeComponent({ sourceX, sourceY, targetX, targetY, data }: 
   return (
     <path
       d={path}
-      stroke="#94A3B8"
+      stroke="rgb(var(--color-border-secondary))"
       strokeWidth={2}
       fill="none"
       className="react-flow__edge-path"

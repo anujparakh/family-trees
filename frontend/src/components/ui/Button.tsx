@@ -17,12 +17,12 @@ interface ButtonProps {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed',
+    'bg-accent-primary text-white hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed',
   secondary:
-    'bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed',
+    'bg-bg-tertiary text-text-primary hover:bg-bg-hover active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed',
   ghost:
-    'text-gray-600 hover:text-gray-800 hover:bg-gray-100 active:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed',
-  icon: 'bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100 shadow-lg border border-gray-200 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed rounded-full',
+    'text-text-secondary hover:text-text-primary hover:bg-bg-hover active:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed',
+  icon: 'bg-bg-secondary text-text-primary hover:bg-bg-hover active:bg-bg-tertiary shadow-lg border border-border-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-full',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -69,7 +69,6 @@ export function Button({
         // Base styles
         'inline-flex items-center justify-center',
         'font-medium transition-colors duration-150',
-        'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
         // Touch-friendly minimum sizes
         'min-w-touch min-h-touch',
         // Variant-specific styles

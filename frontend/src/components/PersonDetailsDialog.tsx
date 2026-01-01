@@ -23,12 +23,12 @@ function RelationshipSection({ title, people }: RelationshipSectionProps) {
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-gray-900 mb-2">{title}</h3>
+      <h3 className="text-sm font-semibold text-text-primary mb-2">{title}</h3>
       <ul className="space-y-1">
         {people.map((person) => (
-          <li key={person.id} className="text-sm text-gray-700">
+          <li key={person.id} className="text-sm text-text-secondary">
             <span className="font-medium">{getPersonFullName(person)}</span>
-            <span className="text-gray-500 ml-2 text-xs">({getPersonDates(person)})</span>
+            <span className="text-text-tertiary ml-2 text-xs">({getPersonDates(person)})</span>
           </li>
         ))}
       </ul>
@@ -54,32 +54,32 @@ function PersonDetailsDialogComponent({
       <div className="space-y-6">
         {/* Basic Information */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Basic Information</h3>
+          <h3 className="text-sm font-semibold text-text-primary mb-2">Basic Information</h3>
           <div className="space-y-1 text-sm">
             {person.birthDate && (
               <div>
-                <span className="text-gray-600">Born:</span>{' '}
-                <span className="text-gray-900">{person.birthDate}</span>
+                <span className="text-text-secondary">Born:</span>{' '}
+                <span className="text-text-primary">{person.birthDate}</span>
               </div>
             )}
             {person.deathDate && (
               <div>
-                <span className="text-gray-600">Died:</span>{' '}
-                <span className="text-gray-900">{person.deathDate}</span>
+                <span className="text-text-secondary">Died:</span>{' '}
+                <span className="text-text-primary">{person.deathDate}</span>
               </div>
             )}
             {person.gender && (
               <div>
-                <span className="text-gray-600">Gender:</span>{' '}
-                <span className="text-gray-900 capitalize">{person.gender}</span>
+                <span className="text-text-secondary">Gender:</span>{' '}
+                <span className="text-text-primary capitalize">{person.gender}</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Relationships */}
-        <div className="space-y-4 border-t border-gray-200 pt-4">
-          <h3 className="text-base font-semibold text-gray-900">Relationships</h3>
+        <div className="space-y-4 border-t border-border-primary pt-4">
+          <h3 className="text-base font-semibold text-text-primary">Relationships</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <RelationshipSection
@@ -110,7 +110,7 @@ function PersonDetailsDialogComponent({
             relationships.children.length === 0 &&
             relationships.siblings.length === 0 &&
             relationships.cousins.length === 0 && (
-              <p className="text-sm text-gray-500 italic">No known relationships</p>
+              <p className="text-sm text-text-tertiary italic">No known relationships</p>
             )}
         </div>
       </div>

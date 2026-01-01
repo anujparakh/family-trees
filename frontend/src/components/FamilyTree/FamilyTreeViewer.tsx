@@ -23,6 +23,7 @@ import { HowToDialog } from '@/components/HowToDialog';
 import { PersonDetailsDialog } from '@/components/PersonDetailsDialog';
 import { hasSeenInstructions, markInstructionsAsSeen } from '@/utils/sessionStorage';
 import { AuthButton } from '@/components/Auth/AuthButton';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface FamilyTreeViewerProps {
   familyTree: FamilyTree;
@@ -91,12 +92,12 @@ export function FamilyTreeViewer({
   };
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-50">
+    <div className="w-full h-screen flex flex-col bg-bg-primary">
       {/* Header with controls */}
-      <div className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+      <div className="bg-bg-secondary border-b border-border-primary p-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <TreeIcon size={28} className="text-blue-500" />
-          <h1 className="text-xl font-semibold text-gray-800">Family Tree</h1>
+          <TreeIcon size={28} className="text-accent-primary" />
+          <h1 className="text-xl font-semibold text-text-primary">Family Tree</h1>
         </div>
         <div className="flex items-center">
           <Button variant="ghost" onClick={() => setIsHowToOpen(true)} ariaLabel="Help">
@@ -105,6 +106,7 @@ export function FamilyTreeViewer({
           <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} ariaLabel="Settings">
             <GearIcon size={20} weight="regular" />
           </Button>
+          <ThemeToggle />
           <AuthButton />
         </div>
       </div>
@@ -135,17 +137,22 @@ export function FamilyTreeViewer({
           zoomOnPinch={true}
           zoomOnDoubleClick={true}
         >
-          <Background color="#E5E7EB" gap={16} />
-          <Controls showInteractive={false} position="top-right" />
+          <Background className="bg-bg-primary [&>*]:!stroke-border-primary" gap={16} />
+          <Controls
+            showInteractive={false}
+            position="top-right"
+            className="[&>button]:!bg-bg-secondary [&>button]:!border-border-primary [&>button]:!fill-text-primary hover:[&>button]:!bg-bg-hover"
+          />
           <MiniMap
             nodeColor={(node) => {
               const data = node.data as PersonNodeData;
               return data.person.gender === 'male'
-                ? '#3B82F6'
+                ? 'rgb(59 130 246)'
                 : data.person.gender === 'female'
-                  ? '#EC4899'
-                  : '#6B7280';
+                  ? 'rgb(236 72 153)'
+                  : 'rgb(107 114 128)';
             }}
+            className="!bg-bg-secondary !border-border-primary"
             nodeStrokeWidth={3}
             zoomable
             pannable

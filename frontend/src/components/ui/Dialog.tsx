@@ -66,12 +66,12 @@ export function Dialog({
 
       {/* Dialog content */}
       <div
-        className={`relative bg-white rounded-lg shadow-xl ${maxWidthClasses[maxWidth]} w-full max-h-[90vh] overflow-hidden flex flex-col animate-fadeIn`}
+        className={`relative bg-bg-secondary rounded-lg shadow-xl ${maxWidthClasses[maxWidth]} w-full max-h-[90vh] overflow-hidden flex flex-col animate-fadeIn`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 id="dialog-title" className="text-xl font-semibold text-gray-900">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
+          <h2 id="dialog-title" className="text-xl font-semibold text-text-primary">
             {title}
           </h2>
           {showCloseButton && (
