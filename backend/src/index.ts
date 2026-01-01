@@ -25,7 +25,10 @@ app.use(
   })
 );
 
+// -------------
 // Public routes
+// -------------
+
 app.get("/", (c) => {
   return c.json({
     message: "Family Trees API",
@@ -36,6 +39,27 @@ app.get("/", (c) => {
 
 app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Public tree listing - anyone can view public trees
+app.get("/trees/public", async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT id, name, description, root_person_id, created_at, updated_at
+       FROM trees
+       WHERE is_public = 1
+       ORDER BY updated_at DESC
+       LIMIT 100`
+    ).all();
+
+    return c.json({
+      trees: result.results,
+      count: result.results.length,
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to fetch public trees" }, 500);
+  }
 });
 
 // Protected routes - require authentication
@@ -52,25 +76,33 @@ protectedRoutes.get("/me", (c) => {
   });
 });
 
-// Example D1 database query
-protectedRoutes.get("/families", async (c) => {
+// -------------------------
+// - User Protected Routes -
+// -------------------------
+
+// Example D1 database query - get trees the user can edit
+protectedRoutes.get("/trees", async (c) => {
   const user = c.get("user");
 
   try {
-    // Example query - you'll need to create this table
+    // Get trees the user has edit access to
     const result = await c.env.DB.prepare(
-      "SELECT * FROM families WHERE user_id = ?"
+      `SELECT t.*, te.role
+       FROM trees t
+       JOIN tree_editors te ON te.tree_id = t.id
+       WHERE te.user_id = ? AND te.role IN ('owner', 'editor')
+       ORDER BY t.updated_at DESC`
     )
       .bind(user.userId)
       .all();
 
     return c.json({
-      families: result.results,
+      trees: result.results,
       count: result.results.length,
     });
   } catch (error) {
     console.error("Database error:", error);
-    return c.json({ error: "Failed to fetch families" }, 500);
+    return c.json({ error: "Failed to fetch trees" }, 500);
   }
 });
 

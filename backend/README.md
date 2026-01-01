@@ -41,10 +41,27 @@ npx wrangler d1 create family-trees-db
 
 ### 4. Run Database Migrations
 
+Apply the schema to your local development database:
+
 ```bash
-# Execute initial schema (once you create migration files)
-npx wrangler d1 execute family-trees-db --local --file=./migrations/0001_initial.sql
+# Apply initial schema
+npx wrangler d1 execute family-trees-db --local --file=./migrations/0001_initial_schema.sql
+
+# Verify tables were created
+npx wrangler d1 execute family-trees-db --local --command "SELECT name FROM sqlite_master WHERE type='table';"
+
+# Optional: Seed example family tree for testing
+npx wrangler d1 execute family-trees-db --local --file=./migrations/0002_seed_example_tree.sql
 ```
+
+For production (after deploying):
+
+```bash
+# Apply to production database
+npx wrangler d1 execute family-trees-db --remote --file=./migrations/0001_initial_schema.sql
+```
+
+See [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) for detailed schema documentation.
 
 ### 5. Run Development Server
 
