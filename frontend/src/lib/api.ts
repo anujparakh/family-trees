@@ -13,10 +13,7 @@ export interface ApiOptions extends RequestInit {
  * @param endpoint - API endpoint (e.g., '/api/families')
  * @param options - Fetch options with optional Clerk token
  */
-export async function apiRequest<T = any>(
-  endpoint: string,
-  options: ApiOptions = {}
-): Promise<T> {
+export async function apiRequest<T = any>(endpoint: string, options: ApiOptions = {}): Promise<T> {
   const { token, headers, ...fetchOptions } = options;
 
   const url = `${API_URL}${endpoint}`;

@@ -173,7 +173,7 @@ export function calculateLayout(
     // Find the bounding box of all nodes
     const allXPositions = nodes.map((n) => n.position.x);
     const minX = Math.min(...allXPositions);
-    const maxX = Math.max(...allXPositions.map((x, i) => x + NODE_WIDTH));
+    const maxX = Math.max(...allXPositions.map((x) => x + NODE_WIDTH));
     const totalWidth = maxX - minX;
 
     // Calculate the center of the first generation

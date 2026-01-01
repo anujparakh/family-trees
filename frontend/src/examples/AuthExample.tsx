@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 import { useUser } from '@clerk/clerk-react';
 import { useAuthenticatedFetch } from '../hooks/useAuthenticatedFetch';
 import { Button } from '../components/ui';

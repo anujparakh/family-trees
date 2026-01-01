@@ -11,10 +11,7 @@ export interface PersonRelationships {
 /**
  * Calculate all relationships for a person in the family tree
  */
-export function getPersonRelationships(
-  personId: string,
-  tree: FamilyTree
-): PersonRelationships {
+export function getPersonRelationships(personId: string, tree: FamilyTree): PersonRelationships {
   const spouses: Person[] = [];
   const parents: Person[] = [];
   const children: Person[] = [];
@@ -22,9 +19,7 @@ export function getPersonRelationships(
   const cousins: Person[] = [];
 
   // Find families where this person is a parent (to get spouse and children)
-  const familiesAsParent = tree.families.filter((family) =>
-    family.parents.includes(personId)
-  );
+  const familiesAsParent = tree.families.filter((family) => family.parents.includes(personId));
 
   // Find families where this person is a child (to get parents and siblings)
   const familiesAsChild = tree.families.filter((family) => family.children.includes(personId));
