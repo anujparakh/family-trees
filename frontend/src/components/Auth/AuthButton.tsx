@@ -1,5 +1,5 @@
 import { SignInButton, UserButton, useUser } from '@clerk/clerk-react';
-import { SignIn } from '@phosphor-icons/react';
+import { SignInIcon } from '@phosphor-icons/react';
 import { Button } from '../ui';
 
 /**
@@ -32,7 +32,7 @@ export function AuthButton() {
   return (
     <SignInButton mode="modal">
       <Button variant="ghost" ariaLabel="Sign In">
-        <SignIn size={20} weight="regular" />
+        <SignInIcon size={20} weight="regular" />
       </Button>
     </SignInButton>
   );

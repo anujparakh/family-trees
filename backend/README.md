@@ -78,6 +78,8 @@ Get the session token from your frontend using Clerk's `getToken()` method.
 
 ## Deployment
 
+### Manual Deployment
+
 ```bash
 # Deploy to Cloudflare Workers
 npm run deploy
@@ -85,6 +87,41 @@ npm run deploy
 # Set production secrets
 npx wrangler secret put CLERK_SECRET_KEY
 ```
+
+### Automated Deployment (GitHub Actions)
+
+The backend automatically deploys to Cloudflare Workers when changes are pushed to the `main` branch in the `backend/` folder.
+
+**Setup GitHub Secrets:**
+
+1. Go to your GitHub repository → Settings → Secrets and variables → Actions
+2. Add the following secrets:
+
+   - `CLOUDFLARE_API_TOKEN`: Create at https://dash.cloudflare.com/profile/api-tokens
+     - Use the "Edit Cloudflare Workers" template
+     - Or create custom token with permissions: `Account.Workers Scripts:Edit`
+
+   - `CLOUDFLARE_ACCOUNT_ID`: Find at https://dash.cloudflare.com/
+     - Click on "Workers & Pages" in sidebar
+     - Your Account ID is shown in the right sidebar
+
+**Get Cloudflare Account ID:**
+```bash
+npx wrangler whoami
+```
+
+**Set Clerk Secret in Cloudflare:**
+
+The `CLERK_SECRET_KEY` must be set separately in Cloudflare (not in GitHub):
+
+```bash
+npx wrangler secret put CLERK_SECRET_KEY
+# Enter your Clerk secret key when prompted
+```
+
+Or set via Cloudflare Dashboard:
+1. Go to Workers & Pages → family-trees-api → Settings → Variables
+2. Add `CLERK_SECRET_KEY` as an environment variable (encrypted)
 
 ## Environment Variables
 
