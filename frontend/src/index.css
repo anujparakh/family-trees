@@ -6,58 +6,57 @@
   /* Light theme (default) */
   :root {
     /* Background colors */
-    --color-bg-primary: 249 250 251;      /* gray-50 */
-    --color-bg-secondary: 255 255 255;     /* white */
-    --color-bg-tertiary: 230 230 230;      /* gray-100 */
-    --color-bg-hover: 243 244 246;         /* gray-100 */
-    --color-bg-selected: 239 246 255;      /* blue-50 */
+    --color-bg-primary: 249 250 251; /* gray-50 */
+    --color-bg-secondary: 255 255 255; /* white */
+    --color-bg-tertiary: 230 230 230; /* gray-100 */
+    --color-bg-hover: 243 244 246; /* gray-100 */
+    --color-bg-selected: 239 246 255; /* blue-50 */
 
     /* Text colors */
-    --color-text-primary: 17 24 39;        /* gray-900 */
-    --color-text-secondary: 55 65 81;      /* gray-700 */
-    --color-text-tertiary: 107 114 128;    /* gray-500 */
+    --color-text-primary: 17 24 39; /* gray-900 */
+    --color-text-secondary: 55 65 81; /* gray-700 */
+    --color-text-tertiary: 107 114 128; /* gray-500 */
 
     /* Border colors */
-    --color-border-primary: 229 231 235;   /* gray-200 */
+    --color-border-primary: 229 231 235; /* gray-200 */
     --color-border-secondary: 209 213 219; /* gray-300 */
 
     /* Gender colors */
-    --color-gender-male: 59 130 246;       /* blue-500 */
-    --color-gender-female: 236 72 153;     /* pink-500 */
-    --color-gender-neutral: 107 114 128;   /* gray-500 */
+    --color-gender-male: 59 130 246; /* blue-500 */
+    --color-gender-female: 236 72 153; /* pink-500 */
+    --color-gender-neutral: 107 114 128; /* gray-500 */
 
     /* Accent color */
-    --color-accent-primary: 59 130 246;    /* blue-500 */
+    --color-accent-primary: 59 130 246; /* blue-500 */
     --color-accent-secondary: 236 72 153; /* pink-500 */
     --color-accent-tertiary: 16 185 129; /* emerald-500 */
-
   }
 
   /* Dark theme */
   .dark {
     /* Background colors */
-    --color-bg-primary: 17 24 39;          /* gray-900 */
-    --color-bg-secondary: 31 41 55;        /* gray-800 */
-    --color-bg-tertiary: 55 65 81;         /* gray-700 */
-    --color-bg-hover: 55 65 81;            /* gray-700 */
-    --color-bg-selected: 30 58 138;        /* blue-900 */
+    --color-bg-primary: 17 24 39; /* gray-900 */
+    --color-bg-secondary: 31 41 55; /* gray-800 */
+    --color-bg-tertiary: 55 65 81; /* gray-700 */
+    --color-bg-hover: 55 65 81; /* gray-700 */
+    --color-bg-selected: 30 58 138; /* blue-900 */
 
     /* Text colors */
-    --color-text-primary: 243 244 246;     /* gray-100 */
-    --color-text-secondary: 209 213 219;   /* gray-300 */
-    --color-text-tertiary: 156 163 175;    /* gray-400 */
+    --color-text-primary: 243 244 246; /* gray-100 */
+    --color-text-secondary: 209 213 219; /* gray-300 */
+    --color-text-tertiary: 156 163 175; /* gray-400 */
 
     /* Border colors */
-    --color-border-primary: 55 65 81;      /* gray-700 */
-    --color-border-secondary: 75 85 99;    /* gray-600 */
+    --color-border-primary: 55 65 81; /* gray-700 */
+    --color-border-secondary: 75 85 99; /* gray-600 */
 
     /* Gender colors (same as light mode) */
-    --color-gender-male: 59 130 246;       /* blue-500 */
-    --color-gender-female: 236 72 153;     /* pink-500 */
-    --color-gender-neutral: 156 163 175;   /* gray-400 */
+    --color-gender-male: 59 130 246; /* blue-500 */
+    --color-gender-female: 236 72 153; /* pink-500 */
+    --color-gender-neutral: 156 163 175; /* gray-400 */
 
     /* Accent color */
-    --color-accent-primary: 59 130 246;    /* blue-500 */
+    --color-accent-primary: 59 130 246; /* blue-500 */
     --color-accent-secondary: 236 72 153; /* pink-500 */
     --color-accent-tertiary: 16 185 129; /* emerald-500 */
   }
@@ -115,7 +114,8 @@
 }
 
 @keyframes growTree {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.8);
   }
   50% {

@@ -35,7 +35,9 @@ export function SettingsDialog({
               />
               <div className="ml-3">
                 <div className="text-sm font-medium text-text-primary">Vertical</div>
-                <div className="text-xs text-text-tertiary">Ancestors at top, descendants below</div>
+                <div className="text-xs text-text-tertiary">
+                  Ancestors at top, descendants below
+                </div>
               </div>
             </label>
 
@@ -50,7 +52,9 @@ export function SettingsDialog({
               />
               <div className="ml-3">
                 <div className="text-sm font-medium text-text-primary">Horizontal</div>
-                <div className="text-xs text-text-tertiary">Ancestors at left, descendants right</div>
+                <div className="text-xs text-text-tertiary">
+                  Ancestors at left, descendants right
+                </div>
               </div>
             </label>
           </div>

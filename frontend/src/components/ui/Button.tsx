@@ -8,7 +8,7 @@ interface ButtonProps {
   children: ComponentChildren;
   variant?: ButtonVariant;
   size?: ButtonSize;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent) => void;
   disabled?: boolean;
   className?: string;
   ariaLabel?: string;

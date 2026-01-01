@@ -11,11 +11,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       ariaLabel={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
     >
-      {theme === 'light' ? (
-        <Moon size={20} weight="regular" />
-      ) : (
-        <Sun size={20} weight="regular" />
-      )}
+      {theme === 'light' ? <Moon size={20} weight="regular" /> : <Sun size={20} weight="regular" />}
     </Button>
   );
 }

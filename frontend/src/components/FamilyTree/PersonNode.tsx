@@ -75,7 +75,9 @@ function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
         <div className="text-text-primary font-semibold text-sm select-none truncate px-1">
           {person.firstName}
         </div>
-        <div className="text-text-secondary text-xs select-none truncate px-1">{person.lastName}</div>
+        <div className="text-text-secondary text-xs select-none truncate px-1">
+          {person.lastName}
+        </div>
       </div>
 
       {/* Lifespan */}

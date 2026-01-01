@@ -3,8 +3,8 @@ import { TreeIcon } from '@/components/ui/icons';
 import { Button } from '@/components/ui';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { AuthButton } from '@/components/Auth/AuthButton';
-import { ArrowLeft, Spinner } from '@phosphor-icons/react';
 import { usePublicTrees } from '@/hooks/useTreeQueries';
+import { SpinnerIcon } from '@phosphor-icons/react';
 
 /**
  * Page showing list of all public trees
@@ -21,9 +21,6 @@ export function TreesListPage() {
       <div className="bg-bg-secondary border-b border-border-primary p-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => setLocation('/')} ariaLabel="Back to home">
-              <ArrowLeft size={20} weight="regular" />
-            </Button>
             <TreeIcon size={28} className="text-accent-primary" />
             <h1 className="text-xl font-semibold text-text-primary">All Trees</h1>
           </div>
@@ -47,7 +44,7 @@ export function TreesListPage() {
           {/* Loading state */}
           {isLoading && (
             <div className="flex justify-center items-center py-12">
-              <Spinner size={48} className="text-accent-primary animate-spin" />
+              <SpinnerIcon size={48} className="text-accent-primary animate-spin" />
             </div>
           )}
 

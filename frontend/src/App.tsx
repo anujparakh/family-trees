@@ -8,9 +8,7 @@ export function App() {
     <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/trees" component={TreesListPage} />
-      <Route path="/trees/:treeId">
-        {(params) => <TreeViewPage params={params} />}
-      </Route>
+      <Route path="/trees/:treeId">{(params) => <TreeViewPage params={params} />}</Route>
       <Route>
         {/* 404 - Not Found */}
         <div className="w-full h-screen flex items-center justify-center bg-bg-primary">

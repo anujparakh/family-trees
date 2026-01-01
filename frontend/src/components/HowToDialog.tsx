@@ -26,8 +26,9 @@ function HowToDialogComponent({ isOpen, onClose }: HowToDialogProps) {
           <h3 className="font-semibold text-text-primary mb-1">Zooming</h3>
           <ul className="list-disc list-inside space-y-1 text-sm">
             <li>
-              Hold <kbd className="px-1.5 py-0.5 bg-bg-tertiary rounded text-xs font-mono">Ctrl</kbd>{' '}
-              (or <kbd className="px-1.5 py-0.5 bg-bg-tertiary rounded text-xs font-mono">Cmd</kbd> on
+              Hold{' '}
+              <kbd className="px-1.5 py-0.5 bg-bg-tertiary rounded text-xs font-mono">Ctrl</kbd> (or{' '}
+              <kbd className="px-1.5 py-0.5 bg-bg-tertiary rounded text-xs font-mono">Cmd</kbd> on
               Mac) and scroll to zoom
             </li>
             <li>
