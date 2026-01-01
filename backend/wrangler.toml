@@ -1,0 +1,14 @@
+name = "family-trees-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+node_compat = true
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "family-trees-db"
+database_id = "" # You'll fill this after creating the D1 database
+
+# Environment variables (add via Cloudflare dashboard or wrangler secret)
+# CLERK_PUBLISHABLE_KEY - from Clerk dashboard
+# CLERK_SECRET_KEY - from Clerk dashboard (use wrangler secret put CLERK_SECRET_KEY)
