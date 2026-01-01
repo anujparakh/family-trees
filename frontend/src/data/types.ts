@@ -20,6 +20,7 @@ export interface Family {
 }
 
 export interface FamilyTree {
+  name: string;
   persons: Record<string, Person>;
   families: Family[];
   rootPersonId: string;

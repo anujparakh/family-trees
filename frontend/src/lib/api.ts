@@ -3,6 +3,7 @@
  */
 
 import { API_URL } from '@/lib/clerk';
+import type { FamilyTree } from '@/data/types';
 
 export interface ApiOptions extends RequestInit {
   token?: string;
@@ -39,4 +40,42 @@ export async function apiRequest<T = any>(endpoint: string, options: ApiOptions 
   }
 
   return response.json();
+}
+
+// -----------------
+// Tree API Methods
+// -----------------
+
+export interface TreeListItem {
+  id: string;
+  name: string;
+  description: string | null;
+  root_person_id: string | null;
+  is_public: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface TreesListResponse {
+  trees: TreeListItem[];
+  count: number;
+}
+
+export interface TreeCompleteResponse {
+  tree: FamilyTree;
+}
+
+/**
+ * Fetch all public trees
+ */
+export async function fetchPublicTrees(): Promise<TreesListResponse> {
+  return apiRequest<TreesListResponse>('/trees/public');
+}
+
+/**
+ * Fetch complete tree data by ID
+ */
+export async function fetchTreeById(treeId: string, token?: string): Promise<FamilyTree> {
+  const response = await apiRequest<TreeCompleteResponse>(`/trees/${treeId}/complete`, { token });
+  return response.tree;
 }

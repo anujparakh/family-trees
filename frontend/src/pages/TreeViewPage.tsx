@@ -1,5 +1,8 @@
+import { useLocation } from 'wouter';
 import { FamilyTreeViewer } from '@/components/FamilyTree/FamilyTreeViewer';
-import { mockFamilyTree } from '@/data/mockFamilyData';
+import { Spinner } from '@phosphor-icons/react';
+import { Button } from '@/components/ui';
+import { useTree } from '@/hooks/useTreeQueries';
 
 interface TreeViewPageProps {
   params: {
@@ -13,19 +16,53 @@ interface TreeViewPageProps {
  */
 export function TreeViewPage({ params }: TreeViewPageProps) {
   const { treeId } = params;
+  const [, setLocation] = useLocation();
+  const { data: tree, isLoading, error, refetch } = useTree(treeId);
 
-  // TODO: Fetch tree data from API using treeId
-  // For now, using mock data
-  console.log('Viewing tree:', treeId);
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex flex-col items-center justify-center bg-bg-primary">
+        <Spinner size={48} className="text-accent-primary animate-spin mb-4" />
+        <p className="text-text-secondary">Loading tree...</p>
+      </div>
+    );
+  }
 
-  // Later this will be replaced with:
-  // const { data: tree, isLoading, error } = useFetchTree(treeId);
-  // if (isLoading) return <LoadingSpinner />;
-  // if (error) return <ErrorMessage />;
+  // Error state
+  if (error) {
+    return (
+      <div className="w-full h-screen flex flex-col items-center justify-center bg-bg-primary">
+        <div className="text-center max-w-md px-4">
+          <h1 className="text-2xl font-bold text-text-primary mb-2">Failed to Load Tree</h1>
+          <p className="text-text-secondary mb-6">
+            {error instanceof Error ? error.message : 'Failed to load tree'}
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Button variant="secondary" onClick={() => setLocation('/trees')}>
+              Back to Trees
+            </Button>
+            <Button variant="primary" onClick={() => refetch()}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render tree viewer
+  if (!tree) {
+    return (
+      <div className="w-full h-screen flex flex-col items-center justify-center bg-bg-primary">
+        <p className="text-text-secondary">Tree not found</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-screen">
-      <FamilyTreeViewer familyTree={mockFamilyTree} />
+      <FamilyTreeViewer familyTree={tree} />
     </div>
   );
 }

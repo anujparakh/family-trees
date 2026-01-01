@@ -46,6 +46,8 @@ export default {
 
         // Accent colors
         'accent-primary': 'rgb(var(--color-accent-primary) / <alpha-value>)',
+        'accent-secondary': 'rgb(var(--color-accent-secondary) / <alpha-value>)',
+        'accent-tertiary': 'rgb(var(--color-accent-tertiary) / <alpha-value>)',
       },
     },
   },

@@ -96,8 +96,11 @@ export function FamilyTreeViewer({
       {/* Header with controls */}
       <div className="bg-bg-secondary border-b border-border-primary p-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <TreeIcon size={28} className="text-accent-primary" />
-          <h1 className="text-xl font-semibold text-text-primary">Family Tree</h1>
+          {/* Button to take you to home page */}
+          <button onClick={() => (window.location.href = '/')}>
+            <TreeIcon size={28} className="text-accent-primary" />
+          </button>
+          <h1 className="text-xl font-semibold text-text-primary">{familyTree.name}</h1>
         </div>
         <div className="flex items-center">
           <Button variant="ghost" onClick={() => setIsHowToOpen(true)} ariaLabel="Help">

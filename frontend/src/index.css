@@ -8,7 +8,7 @@
     /* Background colors */
     --color-bg-primary: 249 250 251;      /* gray-50 */
     --color-bg-secondary: 255 255 255;     /* white */
-    --color-bg-tertiary: 243 244 246;      /* gray-100 */
+    --color-bg-tertiary: 230 230 230;      /* gray-100 */
     --color-bg-hover: 243 244 246;         /* gray-100 */
     --color-bg-selected: 239 246 255;      /* blue-50 */
 
@@ -28,6 +28,9 @@
 
     /* Accent color */
     --color-accent-primary: 59 130 246;    /* blue-500 */
+    --color-accent-secondary: 236 72 153; /* pink-500 */
+    --color-accent-tertiary: 16 185 129; /* emerald-500 */
+
   }
 
   /* Dark theme */
@@ -54,7 +57,9 @@
     --color-gender-neutral: 156 163 175;   /* gray-400 */
 
     /* Accent color */
-    --color-accent-primary: 96 165 250;    /* blue-400 - lighter for dark mode */
+    --color-accent-primary: 59 130 246;    /* blue-500 */
+    --color-accent-secondary: 236 72 153; /* pink-500 */
+    --color-accent-tertiary: 16 185 129; /* emerald-500 */
   }
 
   body {
@@ -91,6 +96,11 @@
   .animate-fadeIn {
     animation: fadeIn 0.2s ease-in-out;
   }
+
+  /* Growing tree animation */
+  .animate-growTree {
+    animation: growTree 3s ease-in-out infinite;
+  }
 }
 
 @keyframes fadeIn {
@@ -101,5 +111,14 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes growTree {
+  0%, 100% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.08);
   }
 }
