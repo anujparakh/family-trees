@@ -3,6 +3,10 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import type { Env, AuthUser } from "./types";
 import { clerkAuth } from "./middleware/auth";
+import trees from "./routes/trees";
+import persons from "./routes/persons";
+import families from "./routes/families";
+import editors from "./routes/editors";
 
 // Define app with proper typing
 type Variables = {
@@ -41,32 +45,27 @@ app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Public tree listing - anyone can view public trees
-app.get("/trees/public", async (c) => {
-  try {
-    const result = await c.env.DB.prepare(
-      `SELECT id, name, description, root_person_id, created_at, updated_at
-       FROM trees
-       WHERE is_public = 1
-       ORDER BY updated_at DESC
-       LIMIT 100`
-    ).all();
+// ---------------------
+// Mount API Routes
+// ---------------------
 
-    return c.json({
-      trees: result.results,
-      count: result.results.length,
-    });
-  } catch (error) {
-    console.error("Database error:", error);
-    return c.json({ error: "Failed to fetch public trees" }, 500);
-  }
-});
+// Trees routes (includes both public and protected)
+app.route("/trees", trees);
+
+// Persons routes
+app.route("/persons", persons);
+
+// Families routes
+app.route("/families", families);
+
+// Tree editors routes
+app.route("/editors", editors);
 
 // Protected routes - require authentication
 const protectedRoutes = new Hono<{ Bindings: Env; Variables: Variables }>();
 protectedRoutes.use("*", clerkAuth());
 
-// Example protected route
+// User info endpoint
 protectedRoutes.get("/me", (c) => {
   const user = c.get("user");
   return c.json({
@@ -74,36 +73,6 @@ protectedRoutes.get("/me", (c) => {
     sessionId: user.sessionId,
     message: "This is your authenticated user info",
   });
-});
-
-// -------------------------
-// - User Protected Routes -
-// -------------------------
-
-// Example D1 database query - get trees the user can edit
-protectedRoutes.get("/trees", async (c) => {
-  const user = c.get("user");
-
-  try {
-    // Get trees the user has edit access to
-    const result = await c.env.DB.prepare(
-      `SELECT t.*, te.role
-       FROM trees t
-       JOIN tree_editors te ON te.tree_id = t.id
-       WHERE te.user_id = ? AND te.role IN ('owner', 'editor')
-       ORDER BY t.updated_at DESC`
-    )
-      .bind(user.userId)
-      .all();
-
-    return c.json({
-      trees: result.results,
-      count: result.results.length,
-    });
-  } catch (error) {
-    console.error("Database error:", error);
-    return c.json({ error: "Failed to fetch trees" }, 500);
-  }
 });
 
 // Mount protected routes under /api
