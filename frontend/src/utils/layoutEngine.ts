@@ -1,4 +1,4 @@
-import { FamilyTree, LayoutResult, PersonNode, FamilyEdge } from '../data/types';
+import { FamilyTree, LayoutResult, PersonNode, FamilyEdge } from '@/data/types';
 
 /**
  * Layout engine for family trees

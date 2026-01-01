@@ -1,7 +1,7 @@
 import { memo } from 'preact/compat';
-import { Dialog } from './ui';
-import { Person, FamilyTree } from '../data/types';
-import { getPersonRelationships, getPersonFullName, getPersonDates } from '../utils/relationships';
+import { Dialog } from '@/components/ui';
+import { Person, FamilyTree } from '@/data/types';
+import { getPersonRelationships, getPersonFullName, getPersonDates } from '@/utils/relationships';
 
 interface PersonDetailsDialogProps {
   isOpen: boolean;

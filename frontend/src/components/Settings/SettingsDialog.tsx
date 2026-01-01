@@ -1,4 +1,4 @@
-import { Dialog } from '../ui';
+import { Dialog } from '@/components/ui';
 
 interface SettingsDialogProps {
   isOpen: boolean;

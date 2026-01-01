@@ -2,7 +2,7 @@
  * API client with Clerk authentication
  */
 
-import { API_URL } from './clerk';
+import { API_URL } from '@/lib/clerk';
 
 export interface ApiOptions extends RequestInit {
   token?: string;

@@ -1,4 +1,4 @@
-import { FamilyTree, Person } from '../data/types';
+import { FamilyTree, Person } from '@/data/types';
 
 export interface PersonRelationships {
   spouses: Person[];

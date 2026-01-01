@@ -1,6 +1,6 @@
 import { useAuth } from '@clerk/clerk-react';
 import { useCallback } from 'preact/hooks';
-import { apiRequest, type ApiOptions } from '../lib/api';
+import { apiRequest, type ApiOptions } from '@/lib/api';
 
 /**
  * Hook for making authenticated API requests

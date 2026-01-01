@@ -1,5 +1,5 @@
-import { FamilyTreeViewer } from './components/FamilyTree/FamilyTreeViewer';
-import { mockFamilyTree } from './data/mockFamilyData';
+import { FamilyTreeViewer } from '@/components/FamilyTree/FamilyTreeViewer';
+import { mockFamilyTree } from '@/data/mockFamilyData';
 
 export function App() {
   return (

@@ -1,4 +1,4 @@
-import { FamilyTree } from './types';
+import { FamilyTree } from '@/data/types';
 
 /**
  * Mock family tree data for POC

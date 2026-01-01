@@ -1,7 +1,7 @@
 import { memo } from 'preact/compat';
 import { format } from 'date-fns';
 import { NodeProps, Handle, Position } from 'reactflow';
-import { PersonNodeData } from '../../data/types';
+import { PersonNodeData } from '@/data/types';
 
 /**
  * PersonNode component - ReactFlow custom node for rendering a person card

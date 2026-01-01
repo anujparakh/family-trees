@@ -11,18 +11,18 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { GearIcon, QuestionIcon } from '@phosphor-icons/react';
-import { PersonNode } from './PersonNode';
-import { SpouseEdge } from './SpouseEdge';
-import { ParentChildEdge } from './ParentChildEdge';
-import { calculateLayout } from '../../utils/layoutEngine';
-import { FamilyTree, PersonNodeData, Person } from '../../data/types';
-import { Button } from '../ui';
-import { TreeIcon } from '../ui/icons';
-import { SettingsDialog } from '../Settings/SettingsDialog';
-import { HowToDialog } from '../HowToDialog';
-import { PersonDetailsDialog } from '../PersonDetailsDialog';
-import { hasSeenInstructions, markInstructionsAsSeen } from '../../utils/sessionStorage';
-import { AuthButton } from '../Auth/AuthButton';
+import { PersonNode } from '@/components/FamilyTree/PersonNode';
+import { SpouseEdge } from '@/components/FamilyTree/SpouseEdge';
+import { ParentChildEdge } from '@/components/FamilyTree/ParentChildEdge';
+import { calculateLayout } from '@/utils/layoutEngine';
+import { FamilyTree, PersonNodeData, Person } from '@/data/types';
+import { Button } from '@/components/ui';
+import { TreeIcon } from '@/components/ui/icons';
+import { SettingsDialog } from '@/components/Settings/SettingsDialog';
+import { HowToDialog } from '@/components/HowToDialog';
+import { PersonDetailsDialog } from '@/components/PersonDetailsDialog';
+import { hasSeenInstructions, markInstructionsAsSeen } from '@/utils/sessionStorage';
+import { AuthButton } from '@/components/Auth/AuthButton';
 
 interface FamilyTreeViewerProps {
   familyTree: FamilyTree;

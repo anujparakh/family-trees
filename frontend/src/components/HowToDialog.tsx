@@ -1,6 +1,6 @@
 import { memo } from 'preact/compat';
-import { Dialog } from './ui';
-import { Button } from './ui';
+import { Dialog } from '@/components/ui';
+import { Button } from '@/components/ui';
 
 interface HowToDialogProps {
   isOpen: boolean;

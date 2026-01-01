@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 import { useUser } from '@clerk/clerk-react';
-import { useAuthenticatedFetch } from '../hooks/useAuthenticatedFetch';
-import { Button } from '../components/ui';
+import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
+import { Button } from '@/components/ui';
 
 /**
  * Example component demonstrating authenticated API requests
