@@ -31,10 +31,8 @@ function HowToDialogComponent({ isOpen, onClose }: HowToDialogProps) {
               Mac) and scroll to zoom
             </li>
             <li>
-              Use the <strong>+</strong> and <strong>-</strong> buttons in the bottom-left corner
-            </li>
-            <li>
-              Click the <strong>fit view</strong> button to see the entire tree
+              Use the <strong>+</strong>, <strong>-</strong> and fit view buttons in the top-right
+              corner
             </li>
           </ul>
         </div>
@@ -44,6 +42,15 @@ function HowToDialogComponent({ isOpen, onClose }: HowToDialogProps) {
           <ul className="list-disc list-inside space-y-1 text-sm">
             <li>Drag with one finger to pan</li>
             <li>Pinch with two fingers to zoom in and out</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-gray-900 mb-1">View / Edit</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li>Tap on a person to view more details</li>
+            <li>(coming soon) Click the edit icon to edit details</li>
+            <li>(coming soon) Click the add button to add a new member</li>
           </ul>
         </div>
 

@@ -165,16 +165,30 @@ export function calculateLayout(
         currentX += NODE_WIDTH + HORIZONTAL_SPACING;
       }
     });
-
-    // Center this generation
-    const genWidth = currentX - HORIZONTAL_SPACING;
-    const offset = -genWidth / 2;
-    nodes.forEach((node) => {
-      if (node.data.generation === gen) {
-        node.position.x += offset;
-      }
-    });
   });
+
+  // Center the first generation (root generation)
+  const firstGenNodes = nodes.filter((node) => node.data.generation === minGen);
+  if (firstGenNodes.length > 0) {
+    // Find the bounding box of all nodes
+    const allXPositions = nodes.map((n) => n.position.x);
+    const minX = Math.min(...allXPositions);
+    const maxX = Math.max(...allXPositions.map((x, i) => x + NODE_WIDTH));
+    const totalWidth = maxX - minX;
+
+    // Calculate the center of the first generation
+    const firstGenMinX = Math.min(...firstGenNodes.map((n) => n.position.x));
+    const firstGenMaxX = Math.max(...firstGenNodes.map((n) => n.position.x + NODE_WIDTH));
+    const firstGenCenter = (firstGenMinX + firstGenMaxX) / 2;
+
+    // Calculate offset to center first generation at totalWidth/2
+    const centerOffset = totalWidth / 2 - firstGenCenter;
+
+    // Shift ALL nodes to center the first generation
+    firstGenNodes.forEach((node) => {
+      node.position.x += centerOffset;
+    });
+  }
 
   // Create edges
   tree.families.forEach((family) => {

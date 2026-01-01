@@ -118,7 +118,7 @@ export function FamilyTreeViewer({
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           fitView
-          fitViewOptions={{ padding: 0.2 }}
+          fitViewOptions={{ padding: 0.1 }}
           minZoom={0.2}
           maxZoom={4}
           defaultViewport={{ x: 0, y: 0, zoom: 0.7 }}
@@ -134,7 +134,7 @@ export function FamilyTreeViewer({
           zoomOnDoubleClick={true}
         >
           <Background color="#E5E7EB" gap={16} />
-          <Controls showInteractive={false} />
+          <Controls showInteractive={false} position="top-right" />
           <MiniMap
             nodeColor={(node) => {
               const data = node.data as PersonNodeData;
