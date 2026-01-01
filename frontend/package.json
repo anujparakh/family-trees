@@ -22,7 +22,8 @@
     "date-fns": "^4.1.0",
     "preact": "^10.27.2",
     "react-family-tree": "^3.2.0",
-    "reactflow": "^11.11.4"
+    "reactflow": "^11.11.4",
+    "wouter": "^3.9.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.2",
