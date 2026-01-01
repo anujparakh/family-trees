@@ -22,6 +22,7 @@ import { SettingsDialog } from '../Settings/SettingsDialog';
 import { HowToDialog } from '../HowToDialog';
 import { PersonDetailsDialog } from '../PersonDetailsDialog';
 import { hasSeenInstructions, markInstructionsAsSeen } from '../../utils/sessionStorage';
+import { AuthButton } from '../Auth/AuthButton';
 
 interface FamilyTreeViewerProps {
   familyTree: FamilyTree;
@@ -104,6 +105,7 @@ export function FamilyTreeViewer({
           <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} ariaLabel="Settings">
             <GearIcon size={20} weight="regular" />
           </Button>
+          <AuthButton />
         </div>
       </div>
 
