@@ -148,7 +148,7 @@ export function MyTreesPage() {
         {/* Trees Table */}
         {trees.length === 0 ? (
           <div className="text-center py-12 bg-bg-secondary rounded-lg border border-border-primary">
-            <p className="text-text-secondary mb-4">You don't have any trees yet</p>
+            <p className="text-text-secondary mb-4">You don&apos;t have any trees yet</p>
             <Button variant="primary" onClick={handleImportClick}>
               <UploadIcon size={20} weight="regular" className="mr-2" />
               Import Your First Tree

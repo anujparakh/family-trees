@@ -26,7 +26,10 @@ interface GEDCOMFamily {
  */
 export async function importFromGEDCOM(file: File): Promise<FamilyTree> {
   const text = await file.text();
-  const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+  const lines = text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
 
   const individuals: Map<string, GEDCOMIndividual> = new Map();
   const families: Map<string, GEDCOMFamily> = new Map();
@@ -83,7 +86,7 @@ export async function importFromGEDCOM(file: File): Promise<FamilyTree> {
           const nameMatch = line.match(/NAME (.+)/);
           if (nameMatch) {
             const fullName = nameMatch[1];
-            const nameParts = fullName.split('/').map(p => p.trim());
+            const nameParts = fullName.split('/').map((p) => p.trim());
             individual.firstName = nameParts[0] || '';
             individual.lastName = nameParts[1] || '';
           }
@@ -259,8 +262,18 @@ export async function importFromGEDCOM(file: File): Promise<FamilyTree> {
  */
 function parseGEDCOMDate(gedcomDate: string): string {
   const monthMap: Record<string, string> = {
-    JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
-    JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12',
+    JAN: '01',
+    FEB: '02',
+    MAR: '03',
+    APR: '04',
+    MAY: '05',
+    JUN: '06',
+    JUL: '07',
+    AUG: '08',
+    SEP: '09',
+    OCT: '10',
+    NOV: '11',
+    DEC: '12',
   };
 
   const parts = gedcomDate.trim().split(' ');

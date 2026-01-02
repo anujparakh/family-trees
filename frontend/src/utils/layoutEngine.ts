@@ -167,28 +167,38 @@ export function calculateLayout(
     });
   });
 
-  // Center the first generation (root generation)
-  const firstGenNodes = nodes.filter((node) => node.data.generation === minGen);
-  if (firstGenNodes.length > 0) {
-    // Find the bounding box of all nodes
-    const allXPositions = nodes.map((n) => n.position.x);
-    const minX = Math.min(...allXPositions);
-    const maxX = Math.max(...allXPositions.map((x) => x + NODE_WIDTH));
-    const totalWidth = maxX - minX;
+  // Center each generation independently
+  // First, find the maximum width among all generations
+  let maxGenerationWidth = 0;
+  genArray.forEach((gen) => {
+    const genNodes = nodes.filter((node) => node.data.generation === gen);
+    if (genNodes.length > 0) {
+      const genMinX = Math.min(...genNodes.map((n) => n.position.x));
+      const genMaxX = Math.max(...genNodes.map((n) => n.position.x + NODE_WIDTH));
+      const genWidth = genMaxX - genMinX;
+      maxGenerationWidth = Math.max(maxGenerationWidth, genWidth);
+    }
+  });
 
-    // Calculate the center of the first generation
-    const firstGenMinX = Math.min(...firstGenNodes.map((n) => n.position.x));
-    const firstGenMaxX = Math.max(...firstGenNodes.map((n) => n.position.x + NODE_WIDTH));
-    const firstGenCenter = (firstGenMinX + firstGenMaxX) / 2;
+  // Now center each generation relative to the maximum width
+  genArray.forEach((gen) => {
+    const genNodes = nodes.filter((node) => node.data.generation === gen);
+    if (genNodes.length > 0) {
+      const genMinX = Math.min(...genNodes.map((n) => n.position.x));
+      const genMaxX = Math.max(...genNodes.map((n) => n.position.x + NODE_WIDTH));
+      // const genWidth = genMaxX - genMinX;
+      const genCenter = (genMinX + genMaxX) / 2;
 
-    // Calculate offset to center first generation at totalWidth/2
-    const centerOffset = totalWidth / 2 - firstGenCenter;
+      // Calculate offset to center this generation
+      const targetCenter = maxGenerationWidth / 2;
+      const centerOffset = targetCenter - genCenter;
 
-    // Shift ALL nodes to center the first generation
-    firstGenNodes.forEach((node) => {
-      node.position.x += centerOffset;
-    });
-  }
+      // Shift all nodes in this generation
+      genNodes.forEach((node) => {
+        node.position.x += centerOffset;
+      });
+    }
+  });
 
   // Create edges
   tree.families.forEach((family) => {

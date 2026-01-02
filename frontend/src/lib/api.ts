@@ -3,7 +3,7 @@
  */
 
 import { API_URL } from '@/lib/clerk';
-import type { FamilyTree } from '@/data/types';
+import type { Family, FamilyTree, Person } from '@/data/types';
 
 export interface ApiOptions extends RequestInit {
   token?: string;
@@ -109,8 +109,8 @@ export async function createCompleteTree(
     name: string;
     description?: string;
     isPublic?: boolean;
-    persons: any[];
-    families: any[];
+    persons: Person[];
+    families: Family[];
     rootPersonId?: string;
   },
   token: string
@@ -136,7 +136,7 @@ export async function createPerson(
     notes?: string;
   },
   token: string
-): Promise<{ person: any }> {
+): Promise<{ person: Person }> {
   return apiRequest('/persons', {
     method: 'POST',
     token,
@@ -157,7 +157,7 @@ export async function createFamily(
     status?: string;
   },
   token: string
-): Promise<{ family: any }> {
+): Promise<{ family: Family }> {
   return apiRequest('/families', {
     method: 'POST',
     token,

@@ -137,7 +137,20 @@ function generateFamilyRecord(family: Family, persons: Record<string, Person>): 
  * Format a date for GEDCOM (DD MMM YYYY format)
  */
 function formatGEDCOMDate(date: Date): string {
-  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const months = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    'DEC',
+  ];
 
   const day = date.getDate();
   const month = months[date.getMonth()];

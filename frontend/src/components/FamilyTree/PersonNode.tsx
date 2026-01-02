@@ -1,23 +1,12 @@
-import { memo } from 'preact/compat';
-import { format } from 'date-fns';
-import { NodeProps, Handle, Position } from 'reactflow';
 import { PersonNodeData } from '@/data/types';
+import { memo } from 'preact/compat';
+import { Handle, NodeProps, Position } from 'reactflow';
 
 /**
  * PersonNode component - ReactFlow custom node for rendering a person card
  */
 function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
   const { person } = data;
-
-  // Format dates for display
-  const birthYear = person.birthDate ? format(new Date(person.birthDate), 'yyyy') : '?';
-  const deathYear = person.deathDate
-    ? format(new Date(person.deathDate), 'yyyy')
-    : person.birthDate
-      ? 'present'
-      : '?';
-
-  const lifespan = `${birthYear} - ${deathYear}`;
 
   // Gender-based styling
   const borderColor =
@@ -79,11 +68,6 @@ function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
           {person.lastName}
         </div>
       </div>
-
-      {/* Lifespan */}
-      {/* <div className="text-center text-text-tertiary text-[10px] mt-auto select-none truncate px-1 shrink-0">
-        {lifespan}
-      </div> */}
     </div>
   );
 }
