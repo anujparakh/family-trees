@@ -7,6 +7,7 @@ interface DialogProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  subtitle?: string;
   children: ComponentChildren;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
   showCloseButton?: boolean;
@@ -30,6 +31,7 @@ export function Dialog({
   children,
   maxWidth = 'md',
   showCloseButton = true,
+  subtitle,
 }: DialogProps) {
   // Handle ESC key to close dialog
   useEffect(() => {
@@ -71,9 +73,12 @@ export function Dialog({
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
-          <h2 id="dialog-title" className="text-xl font-semibold text-text-primary">
-            {title}
-          </h2>
+          <div>
+            <h2 id="dialog-title" className="text-xl font-semibold text-text-primary">
+              {title}
+            </h2>
+            {subtitle && <p className="text-xs mt-1 text-text-secondary opacity-80">{subtitle}</p>}
+          </div>
           {showCloseButton && (
             <Button variant="ghost" size="sm" onClick={onClose} ariaLabel="Close dialog">
               <XIcon size={20} weight="bold" />

@@ -20,7 +20,7 @@ function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
 
   return (
     <div
-      className={`${bgColor} ${borderColor} border-2 rounded-lg shadow-md hover:shadow-lg hover:bg-bg-hover transition-all cursor-pointer overflow-hidden flex flex-col p-2 min-w-[140px] max-w-[140px] min-h-[100px]`}
+      className={`${bgColor} ${borderColor} border-2 rounded-lg shadow-md hover:shadow-lg hover:bg-bg-hover transition-all cursor-pointer overflow-hidden flex flex-col p-2 min-w-[140px] max-w-[140px] min-h-[120px]`}
     >
       {/* Connection handles for edges - hidden but functional */}
       <Handle
@@ -50,23 +50,19 @@ function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
       />
 
       {/* Avatar circle with initials */}
-      <div className="flex justify-center mb-1 shrink-0">
+      {/* <div className="flex justify-center mb-1 shrink-0">
         <div className="w-9 h-9 rounded-full bg-bg-tertiary border border-border-secondary flex items-center justify-center">
           <span className="text-text-secondary font-semibold text-xs select-none">
             {person.firstName && person.firstName[0]}
             {person.lastName && person.lastName[0]}
           </span>
         </div>
-      </div>
+      </div> */}
 
       {/* Name */}
-      <div className="text-center min-w-0 flex-1">
-        <div className="text-text-primary font-semibold text-sm select-none truncate px-1">
-          {person.firstName}
-        </div>
-        <div className="text-text-secondary text-xs select-none truncate px-1">
-          {person.lastName}
-        </div>
+      <div className="flex flex-col items-center justify-center text-center min-w-0 flex-1 text-lg text-wrap">
+        <div className="text-text-primary font-semibold select-none px-1">{person.firstName}</div>
+        <div className="text-text-secondary select-none px-1">{person.lastName}</div>
       </div>
     </div>
   );

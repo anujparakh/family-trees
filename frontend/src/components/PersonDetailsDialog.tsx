@@ -1,7 +1,7 @@
-import { memo } from 'preact/compat';
 import { Dialog } from '@/components/ui';
-import { Person, FamilyTree } from '@/data/types';
-import { getPersonRelationships, getPersonFullName, getPersonDates } from '@/utils/relationships';
+import { FamilyTree, Person } from '@/data/types';
+import { getPersonFullName, getPersonRelationships } from '@/utils/relationships';
+import { memo } from 'preact/compat';
 
 interface PersonDetailsDialogProps {
   isOpen: boolean;
@@ -28,7 +28,6 @@ function RelationshipSection({ title, people }: RelationshipSectionProps) {
         {people.map((person) => (
           <li key={person.id} className="text-sm text-text-secondary">
             <span className="font-medium">{getPersonFullName(person)}</span>
-            <span className="text-text-tertiary ml-2 text-xs">({getPersonDates(person)})</span>
           </li>
         ))}
       </ul>
