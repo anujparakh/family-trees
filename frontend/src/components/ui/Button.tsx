@@ -54,7 +54,6 @@ export function Button({
   const isIcon = variant === 'icon';
   const clickit = () => {
     if (onClick) {
-      console.log('Clicking ', ariaLabel);
       onClick();
     }
   };
