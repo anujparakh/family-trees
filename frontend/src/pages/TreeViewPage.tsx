@@ -1,17 +1,18 @@
-import { useState, useEffect } from 'preact/hooks';
-import { useLocation } from 'wouter';
-import { FamilyTreeViewer } from '@/components/FamilyTree/FamilyTreeViewer';
-import { Spinner, QuestionIcon, GearIcon } from '@phosphor-icons/react';
-import { Button } from '@/components/ui';
-import { TreeIcon } from '@/components/ui/icons';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { AuthButton } from '@/components/Auth/AuthButton';
+import { FamilyTreeViewer } from '@/components/FamilyTree/FamilyTreeViewer';
+import { HowToDialog } from '@/components/HowToDialog';
 import { PersonDetailsDialog } from '@/components/PersonDetailsDialog';
 import { SettingsDialog } from '@/components/Settings/SettingsDialog';
-import { HowToDialog } from '@/components/HowToDialog';
-import { hasSeenInstructions, markInstructionsAsSeen } from '@/utils/sessionStorage';
-import { useTree } from '@/hooks/useTreeQueries';
+import { ShareDialog } from '@/components/ShareDialog';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { Button } from '@/components/ui';
+import { TreeIcon } from '@/components/ui/icons';
 import type { Person } from '@/data/types';
+import { useTree } from '@/hooks/useTreeQueries';
+import { hasSeenInstructions, markInstructionsAsSeen } from '@/utils/sessionStorage';
+import { QuestionIcon, ShareNetworkIcon, Spinner } from '@phosphor-icons/react';
+import { useEffect, useState } from 'preact/hooks';
+import { useLocation } from 'wouter';
 
 interface TreeViewPageProps {
   params: {
@@ -33,6 +34,7 @@ export function TreeViewPage({ params }: TreeViewPageProps) {
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHowToOpen, setIsHowToOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   // Check if user has seen instructions on mount
   useEffect(() => {
@@ -110,6 +112,12 @@ export function TreeViewPage({ params }: TreeViewPageProps) {
           <Button variant="ghost" onClick={() => setIsHowToOpen(true)} ariaLabel="How to navigate">
             <QuestionIcon size={20} weight="regular" />
           </Button>
+          {/* Show share button only if user has edit access */}
+          {(tree.userRole === 'owner' || tree.userRole === 'editor') && (
+            <Button variant="ghost" onClick={() => setIsShareOpen(true)} ariaLabel="Share">
+              <ShareNetworkIcon size={20} weight="regular" />
+            </Button>
+          )}
           {/* <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} ariaLabel="Settings">
             <GearIcon size={20} weight="regular" />
           </Button> */}
@@ -143,6 +151,8 @@ export function TreeViewPage({ params }: TreeViewPageProps) {
       />
 
       <HowToDialog isOpen={isHowToOpen} onClose={handleHowToClose} />
+
+      <ShareDialog isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} tree={tree} />
     </div>
   );
 }

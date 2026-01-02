@@ -1,7 +1,11 @@
-import { Hono } from 'hono';
-import type { Env, AuthUser } from '../types';
-import { requireEditAccess, requireOwnerAccess, canViewTree } from '../middleware/permissions';
-import { clerkAuth } from '../middleware/auth';
+import { Hono } from "hono";
+import type { Env, AuthUser } from "../types";
+import {
+  requireEditAccess,
+  requireOwnerAccess,
+  canViewTree,
+} from "../middleware/permissions";
+import { clerkAuth } from "../middleware/auth";
 
 type Variables = {
   user: AuthUser;
@@ -17,7 +21,7 @@ const trees = new Hono<{ Bindings: Env; Variables: Variables }>();
  * GET /trees/public
  * List all public trees
  */
-trees.get('/public', async (c) => {
+trees.get("/public", async (c) => {
   try {
     const result = await c.env.DB.prepare(
       `SELECT id, name, description, root_person_id, created_at, updated_at
@@ -32,8 +36,8 @@ trees.get('/public', async (c) => {
       count: result.results.length,
     });
   } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to fetch public trees' }, 500);
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to fetch public trees" }, 500);
   }
 });
 
@@ -41,16 +45,16 @@ trees.get('/public', async (c) => {
  * GET /trees/:treeId
  * Get a single tree by ID (public trees or user has access)
  */
-trees.get('/:treeId', async (c) => {
-  const treeId = c.req.param('treeId');
+trees.get("/:treeId", async (c) => {
+  const treeId = c.req.param("treeId");
 
   // Get user ID if authenticated (optional)
-  const authHeader = c.req.header('Authorization');
+  const authHeader = c.req.header("Authorization");
   let userId: string | undefined;
 
-  if (authHeader?.startsWith('Bearer ')) {
+  if (authHeader?.startsWith("Bearer ")) {
     try {
-      const { verifyToken } = await import('@clerk/backend');
+      const { verifyToken } = await import("@clerk/backend");
       const token = authHeader.substring(7);
       const payload = await verifyToken(token, {
         secretKey: c.env.CLERK_SECRET_KEY,
@@ -65,24 +69,22 @@ trees.get('/:treeId', async (c) => {
   const hasAccess = await canViewTree(c.env.DB, treeId, userId);
 
   if (!hasAccess) {
-    return c.json({ error: 'Tree not found or is private' }, 404);
+    return c.json({ error: "Tree not found or is private" }, 404);
   }
 
   try {
-    const tree = await c.env.DB.prepare(
-      'SELECT * FROM trees WHERE id = ?'
-    )
+    const tree = await c.env.DB.prepare("SELECT * FROM trees WHERE id = ?")
       .bind(treeId)
       .first();
 
     if (!tree) {
-      return c.json({ error: 'Tree not found' }, 404);
+      return c.json({ error: "Tree not found" }, 404);
     }
 
     return c.json({ tree });
   } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to fetch tree' }, 500);
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to fetch tree" }, 500);
   }
 });
 
@@ -90,16 +92,16 @@ trees.get('/:treeId', async (c) => {
  * GET /trees/:treeId/complete
  * Get complete tree data (persons + families) - public or with access
  */
-trees.get('/:treeId/complete', async (c) => {
-  const treeId = c.req.param('treeId');
+trees.get("/:treeId/complete", async (c) => {
+  const treeId = c.req.param("treeId");
 
   // Get user ID if authenticated (optional)
-  const authHeader = c.req.header('Authorization');
+  const authHeader = c.req.header("Authorization");
   let userId: string | undefined;
 
-  if (authHeader?.startsWith('Bearer ')) {
+  if (authHeader?.startsWith("Bearer ")) {
     try {
-      const { verifyToken } = await import('@clerk/backend');
+      const { verifyToken } = await import("@clerk/backend");
       const token = authHeader.substring(7);
       const payload = await verifyToken(token, {
         secretKey: c.env.CLERK_SECRET_KEY,
@@ -114,29 +116,40 @@ trees.get('/:treeId/complete', async (c) => {
   const hasAccess = await canViewTree(c.env.DB, treeId, userId);
 
   if (!hasAccess) {
-    return c.json({ error: 'Tree not found or is private' }, 404);
+    return c.json({ error: "Tree not found or is private" }, 404);
   }
 
   try {
     // Get tree metadata
-    const tree = await c.env.DB.prepare('SELECT * FROM trees WHERE id = ?')
+    const tree = await c.env.DB.prepare("SELECT * FROM trees WHERE id = ?")
       .bind(treeId)
       .first();
 
     if (!tree) {
-      return c.json({ error: 'Tree not found' }, 404);
+      return c.json({ error: "Tree not found" }, 404);
+    }
+
+    // Get user's role if authenticated
+    let userRole: string | null = null;
+    if (userId) {
+      const editorRecord = await c.env.DB.prepare(
+        "SELECT role FROM tree_editors WHERE tree_id = ? AND user_id = ?"
+      )
+        .bind(treeId, userId)
+        .first();
+      userRole = (editorRecord?.role as string) || null;
     }
 
     // Get all persons
     const persons = await c.env.DB.prepare(
-      'SELECT * FROM persons WHERE tree_id = ?'
+      "SELECT * FROM persons WHERE tree_id = ?"
     )
       .bind(treeId)
       .all();
 
     // Get all families
     const families = await c.env.DB.prepare(
-      'SELECT * FROM families WHERE tree_id = ?'
+      "SELECT * FROM families WHERE tree_id = ?"
     )
       .bind(treeId)
       .all();
@@ -204,11 +217,12 @@ trees.get('/:treeId/complete', async (c) => {
         persons: personsObject,
         families: familiesWithRelations,
         rootPersonId: tree.root_person_id,
+        userRole,
       },
     });
   } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to fetch tree data' }, 500);
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to fetch tree data" }, 500);
   }
 });
 
@@ -220,8 +234,8 @@ trees.get('/:treeId/complete', async (c) => {
  * GET /trees (authenticated)
  * List trees the user can edit
  */
-trees.get('/', clerkAuth(), async (c) => {
-  const user = c.get('user');
+trees.get("/", clerkAuth(), async (c) => {
+  const user = c.get("user");
 
   try {
     const result = await c.env.DB.prepare(
@@ -239,8 +253,8 @@ trees.get('/', clerkAuth(), async (c) => {
       count: result.results.length,
     });
   } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to fetch trees' }, 500);
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to fetch trees" }, 500);
   }
 });
 
@@ -248,14 +262,14 @@ trees.get('/', clerkAuth(), async (c) => {
  * POST /trees
  * Create a new tree
  */
-trees.post('/', clerkAuth(), async (c) => {
-  const user = c.get('user');
+trees.post("/", clerkAuth(), async (c) => {
+  const user = c.get("user");
   const body = await c.req.json();
 
   const { name, description, isPublic = true } = body;
 
   if (!name) {
-    return c.json({ error: 'Tree name is required' }, 400);
+    return c.json({ error: "Tree name is required" }, 400);
   }
 
   const treeId = crypto.randomUUID();
@@ -278,14 +292,14 @@ trees.post('/', clerkAuth(), async (c) => {
       .run();
 
     // Fetch the created tree
-    const tree = await c.env.DB.prepare('SELECT * FROM trees WHERE id = ?')
+    const tree = await c.env.DB.prepare("SELECT * FROM trees WHERE id = ?")
       .bind(treeId)
       .first();
 
     return c.json({ tree }, 201);
   } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to create tree' }, 500);
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to create tree" }, 500);
   }
 });
 
@@ -293,8 +307,8 @@ trees.post('/', clerkAuth(), async (c) => {
  * PATCH /trees/:treeId
  * Update a tree (requires edit access)
  */
-trees.patch('/:treeId', clerkAuth(), requireEditAccess(), async (c) => {
-  const treeId = c.req.param('treeId');
+trees.patch("/:treeId", clerkAuth(), requireEditAccess(), async (c) => {
+  const treeId = c.req.param("treeId");
   const body = await c.req.json();
 
   const { name, description, isPublic, rootPersonId } = body;
@@ -304,42 +318,42 @@ trees.patch('/:treeId', clerkAuth(), requireEditAccess(), async (c) => {
     const bindings: any[] = [];
 
     if (name !== undefined) {
-      updates.push('name = ?');
+      updates.push("name = ?");
       bindings.push(name);
     }
     if (description !== undefined) {
-      updates.push('description = ?');
+      updates.push("description = ?");
       bindings.push(description);
     }
     if (isPublic !== undefined) {
-      updates.push('is_public = ?');
+      updates.push("is_public = ?");
       bindings.push(isPublic ? 1 : 0);
     }
     if (rootPersonId !== undefined) {
-      updates.push('root_person_id = ?');
+      updates.push("root_person_id = ?");
       bindings.push(rootPersonId);
     }
 
     if (updates.length === 0) {
-      return c.json({ error: 'No fields to update' }, 400);
+      return c.json({ error: "No fields to update" }, 400);
     }
 
     bindings.push(treeId);
 
     await c.env.DB.prepare(
-      `UPDATE trees SET ${updates.join(', ')} WHERE id = ?`
+      `UPDATE trees SET ${updates.join(", ")} WHERE id = ?`
     )
       .bind(...bindings)
       .run();
 
-    const tree = await c.env.DB.prepare('SELECT * FROM trees WHERE id = ?')
+    const tree = await c.env.DB.prepare("SELECT * FROM trees WHERE id = ?")
       .bind(treeId)
       .first();
 
     return c.json({ tree });
   } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to update tree' }, 500);
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to update tree" }, 500);
   }
 });
 
@@ -347,18 +361,16 @@ trees.patch('/:treeId', clerkAuth(), requireEditAccess(), async (c) => {
  * DELETE /trees/:treeId
  * Delete a tree (requires owner access)
  */
-trees.delete('/:treeId', clerkAuth(), requireOwnerAccess(), async (c) => {
-  const treeId = c.req.param('treeId');
+trees.delete("/:treeId", clerkAuth(), requireOwnerAccess(), async (c) => {
+  const treeId = c.req.param("treeId");
 
   try {
-    await c.env.DB.prepare('DELETE FROM trees WHERE id = ?')
-      .bind(treeId)
-      .run();
+    await c.env.DB.prepare("DELETE FROM trees WHERE id = ?").bind(treeId).run();
 
-    return c.json({ message: 'Tree deleted successfully' });
+    return c.json({ message: "Tree deleted successfully" });
   } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to delete tree' }, 500);
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to delete tree" }, 500);
   }
 });
 

@@ -20,10 +20,13 @@ export interface Family {
 }
 
 export interface FamilyTree {
+  id?: string;
   name: string;
+  description?: string;
   persons: Record<string, Person>;
   families: Family[];
   rootPersonId: string;
+  userRole?: 'owner' | 'editor' | 'viewer' | null;
 }
 
 // ReactFlow-compatible types
