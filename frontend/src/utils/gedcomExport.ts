@@ -71,6 +71,16 @@ function generateIndividualRecord(person: Person): string[] {
     lines.push(`2 DATE ${formatGEDCOMDate(new Date(person.deathDate))}`);
   }
 
+  // Notes
+  if (person.notes) {
+    const noteLines = person.notes.split('\n');
+    lines.push(`1 NOTE ${noteLines[0]}`);
+    // Add continuation lines for multi-line notes
+    for (let i = 1; i < noteLines.length; i++) {
+      lines.push(`2 CONT ${noteLines[i]}`);
+    }
+  }
+
   return lines;
 }
 

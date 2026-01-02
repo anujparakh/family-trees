@@ -1,10 +1,9 @@
 import { useLocation } from 'wouter';
-import { TreeIcon } from '@/components/ui/icons';
 import { Button } from '@/components/ui';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { AuthButton } from '@/components/Auth/AuthButton';
+import { Header } from '@/components/Header';
 import { usePublicTrees } from '@/hooks/useTreeQueries';
 import { SpinnerIcon } from '@phosphor-icons/react';
+import { TreeIcon } from '@/components/ui/icons';
 
 /**
  * Page showing list of all public trees
@@ -17,19 +16,7 @@ export function TreesListPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-bg-primary">
-      {/* Header */}
-      <div className="bg-bg-secondary border-b border-border-primary p-4">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <TreeIcon size={28} className="text-accent-primary" />
-            <h1 className="text-xl font-semibold text-text-primary">All Trees</h1>
-          </div>
-          <div className="flex items-center gap-1">
-            <ThemeToggle />
-            <AuthButton />
-          </div>
-        </div>
-      </div>
+      <Header title="All Trees" backTo="/" backLabel="Home" />
 
       {/* Main content */}
       <div className="flex-1 p-6">

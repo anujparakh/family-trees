@@ -64,8 +64,8 @@ function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
       <div className="flex justify-center mb-1 shrink-0">
         <div className="w-9 h-9 rounded-full bg-bg-tertiary border border-border-secondary flex items-center justify-center">
           <span className="text-text-secondary font-semibold text-xs select-none">
-            {person.firstName[0]}
-            {person.lastName[0]}
+            {person.firstName && person.firstName[0]}
+            {person.lastName && person.lastName[0]}
           </span>
         </div>
       </div>
@@ -81,9 +81,9 @@ function PersonNodeComponent({ data, selected }: NodeProps<PersonNodeData>) {
       </div>
 
       {/* Lifespan */}
-      <div className="text-center text-text-tertiary text-[10px] mt-auto select-none truncate px-1 shrink-0">
+      {/* <div className="text-center text-text-tertiary text-[10px] mt-auto select-none truncate px-1 shrink-0">
         {lifespan}
-      </div>
+      </div> */}
     </div>
   );
 }

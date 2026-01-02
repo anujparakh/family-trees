@@ -79,3 +79,88 @@ export async function fetchTreeById(treeId: string, token?: string): Promise<Fam
   const response = await apiRequest<TreeCompleteResponse>(`/trees/${treeId}/complete`, { token });
   return response.tree;
 }
+
+/**
+ * Fetch trees owned/editable by the current user
+ */
+export async function fetchMyTrees(token: string): Promise<TreesListResponse> {
+  return apiRequest<TreesListResponse>('/trees', { token });
+}
+
+/**
+ * Create a new tree
+ */
+export async function createTree(
+  data: { name: string; description?: string; isPublic?: boolean },
+  token: string
+): Promise<{ tree: any }> {
+  return apiRequest('/trees', {
+    method: 'POST',
+    token,
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Create a complete tree with all persons and families in one request
+ */
+export async function createCompleteTree(
+  data: {
+    name: string;
+    description?: string;
+    isPublic?: boolean;
+    persons: any[];
+    families: any[];
+    rootPersonId?: string;
+  },
+  token: string
+): Promise<{ tree: any }> {
+  return apiRequest('/trees/complete', {
+    method: 'POST',
+    token,
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Create a new person
+ */
+export async function createPerson(
+  data: {
+    treeId: string;
+    firstName: string;
+    lastName?: string;
+    birthDate?: string;
+    deathDate?: string;
+    gender?: 'male' | 'female' | 'other';
+    notes?: string;
+  },
+  token: string
+): Promise<{ person: any }> {
+  return apiRequest('/persons', {
+    method: 'POST',
+    token,
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Create a new family
+ */
+export async function createFamily(
+  data: {
+    treeId: string;
+    parents?: string[];
+    children?: string[];
+    marriageDate?: string;
+    divorceDate?: string;
+    status?: string;
+  },
+  token: string
+): Promise<{ family: any }> {
+  return apiRequest('/families', {
+    method: 'POST',
+    token,
+    body: JSON.stringify(data),
+  });
+}

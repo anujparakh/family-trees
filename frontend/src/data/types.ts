@@ -8,6 +8,7 @@ export interface Person {
   deathDate?: string;
   gender?: 'male' | 'female' | 'other';
   avatarUrl?: string;
+  notes?: string;
 }
 
 export interface Family {

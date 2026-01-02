@@ -1,12 +1,10 @@
-import { AuthButton } from '@/components/Auth/AuthButton';
 import { FamilyTreeViewer } from '@/components/FamilyTree/FamilyTreeViewer';
+import { Header } from '@/components/Header';
 import { HowToDialog } from '@/components/HowToDialog';
 import { PersonDetailsDialog } from '@/components/PersonDetailsDialog';
 import { SettingsDialog } from '@/components/Settings/SettingsDialog';
 import { ShareDialog } from '@/components/ShareDialog';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui';
-import { TreeIcon } from '@/components/ui/icons';
 import type { Person } from '@/data/types';
 import { useTree } from '@/hooks/useTreeQueries';
 import { hasSeenInstructions, markInstructionsAsSeen } from '@/utils/sessionStorage';
@@ -95,36 +93,17 @@ export function TreeViewPage({ params }: TreeViewPageProps) {
 
   return (
     <div className="w-full h-screen flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 bg-bg-secondary border-b border-border-primary">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setLocation('/')}
-            className="p-2 hover:bg-bg-hover rounded-lg transition-colors"
-            aria-label="Landing Page"
-          >
-            <TreeIcon size={24} className="text-accent-primary" />
-          </button>
-          <h1 className="text-xl font-semibold text-text-primary">{tree.name}</h1>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" onClick={() => setIsHowToOpen(true)} ariaLabel="How to navigate">
-            <QuestionIcon size={20} weight="regular" />
+      <Header title={tree.name} backTo="/" backLabel="Landing Page">
+        <Button variant="ghost" onClick={() => setIsHowToOpen(true)} ariaLabel="How to navigate">
+          <QuestionIcon size={20} weight="regular" />
+        </Button>
+        {/* Show share button only if user has edit access */}
+        {(tree.userRole === 'owner' || tree.userRole === 'editor') && (
+          <Button variant="ghost" onClick={() => setIsShareOpen(true)} ariaLabel="Share">
+            <ShareNetworkIcon size={20} weight="regular" />
           </Button>
-          {/* Show share button only if user has edit access */}
-          {(tree.userRole === 'owner' || tree.userRole === 'editor') && (
-            <Button variant="ghost" onClick={() => setIsShareOpen(true)} ariaLabel="Share">
-              <ShareNetworkIcon size={20} weight="regular" />
-            </Button>
-          )}
-          {/* <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} ariaLabel="Settings">
-            <GearIcon size={20} weight="regular" />
-          </Button> */}
-          <ThemeToggle />
-          <AuthButton />
-        </div>
-      </header>
+        )}
+      </Header>
 
       {/* Tree Viewer */}
       <div className="flex-1 overflow-hidden">

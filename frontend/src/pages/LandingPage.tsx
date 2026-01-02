@@ -76,7 +76,7 @@ export function LandingPage() {
             <Button
               variant="secondary"
               size="lg"
-              onClick={() => setLocation('/trees')}
+              onClick={() => setLocation('/my-trees')}
               className="min-w-[200px] !bg-accent-tertiary !text-white"
             >
               My Trees

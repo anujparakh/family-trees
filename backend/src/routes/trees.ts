@@ -205,6 +205,7 @@ trees.get("/:treeId/complete", async (c) => {
         deathDate: person.death_date,
         gender: person.gender,
         avatarUrl: person.avatar_url,
+        notes: person.notes,
       };
       return acc;
     }, {});
@@ -255,6 +256,119 @@ trees.get("/", clerkAuth(), async (c) => {
   } catch (error) {
     console.error("Database error:", error);
     return c.json({ error: "Failed to fetch trees" }, 500);
+  }
+});
+
+/**
+ * POST /trees/complete
+ * Create a complete tree with all persons and families in one request
+ */
+trees.post("/complete", clerkAuth(), async (c) => {
+  const user = c.get("user");
+  const body = await c.req.json();
+
+  const { name, description, isPublic = false, persons, families, rootPersonId } = body;
+
+  if (!name) {
+    return c.json({ error: "Tree name is required" }, 400);
+  }
+
+  const treeId = crypto.randomUUID();
+
+  try {
+    // Create tree
+    await c.env.DB.prepare(
+      `INSERT INTO trees (id, name, description, is_public, root_person_id, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, unixepoch(), unixepoch())`
+    )
+      .bind(treeId, name, description || null, isPublic ? 1 : 0, rootPersonId || null)
+      .run();
+
+    // Grant creator ownership
+    await c.env.DB.prepare(
+      `INSERT INTO tree_editors (tree_id, user_id, role, created_at)
+       VALUES (?, ?, 'owner', unixepoch())`
+    )
+      .bind(treeId, user.userId)
+      .run();
+
+    // Create all persons
+    if (persons && Array.isArray(persons)) {
+      for (const person of persons) {
+        await c.env.DB.prepare(
+          `INSERT INTO persons (
+            id, tree_id, first_name, last_name, birth_date, death_date,
+            gender, avatar_url, notes, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), unixepoch())`
+        )
+          .bind(
+            person.id,
+            treeId,
+            person.firstName,
+            person.lastName || null,
+            person.birthDate || null,
+            person.deathDate || null,
+            person.gender || null,
+            person.avatarUrl || null,
+            person.notes || null
+          )
+          .run();
+      }
+    }
+
+    // Create all families
+    if (families && Array.isArray(families)) {
+      for (const family of families) {
+        // Create family
+        await c.env.DB.prepare(
+          `INSERT INTO families (
+            id, tree_id, marriage_date, divorce_date, status, notes,
+            created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, unixepoch(), unixepoch())`
+        )
+          .bind(
+            family.id,
+            treeId,
+            family.marriageDate || null,
+            family.divorceDate || null,
+            family.status || 'unknown',
+            family.notes || null
+          )
+          .run();
+
+        // Add parents
+        if (family.parents && Array.isArray(family.parents)) {
+          for (const parentId of family.parents) {
+            await c.env.DB.prepare(
+              'INSERT INTO family_parents (family_id, person_id, created_at) VALUES (?, ?, unixepoch())'
+            )
+              .bind(family.id, parentId)
+              .run();
+          }
+        }
+
+        // Add children
+        if (family.children && Array.isArray(family.children)) {
+          for (let i = 0; i < family.children.length; i++) {
+            await c.env.DB.prepare(
+              'INSERT INTO family_children (family_id, person_id, birth_order, created_at) VALUES (?, ?, ?, unixepoch())'
+            )
+              .bind(family.id, family.children[i], i + 1)
+              .run();
+          }
+        }
+      }
+    }
+
+    // Fetch the created tree
+    const tree = await c.env.DB.prepare("SELECT * FROM trees WHERE id = ?")
+      .bind(treeId)
+      .first();
+
+    return c.json({ tree }, 201);
+  } catch (error) {
+    console.error("Database error:", error);
+    return c.json({ error: "Failed to create tree" }, 500);
   }
 });
 

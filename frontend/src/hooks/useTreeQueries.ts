@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@clerk/clerk-react';
-import { fetchPublicTrees, fetchTreeById } from '@/lib/api';
+import { fetchPublicTrees, fetchTreeById, fetchMyTrees } from '@/lib/api';
 
 /**
  * Query hook to fetch all public trees
@@ -26,5 +26,23 @@ export function useTree(treeId: string) {
       return fetchTreeById(treeId, token || undefined);
     },
     enabled: !!treeId,
+  });
+}
+
+/**
+ * Query hook to fetch trees owned/editable by the current user
+ * Requires authentication
+ */
+export function useMyTrees() {
+  const { getToken, isSignedIn } = useAuth();
+
+  return useQuery({
+    queryKey: ['trees', 'my-trees'],
+    queryFn: async () => {
+      const token = await getToken();
+      if (!token) throw new Error('Not authenticated');
+      return fetchMyTrees(token);
+    },
+    enabled: isSignedIn,
   });
 }
